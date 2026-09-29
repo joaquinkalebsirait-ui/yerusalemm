@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persekutuan & Penyesat - Biblical Werewolf GM Assistant</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cinzel Decorative, Cinzel, & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        parchment: {
+                            900: '#14100c',
+                            800: '#1f1913',
+                            700: '#2d241c',
+                            600: '#3d3126',
+                            500: '#5c4a3a',
+                            300: '#c2b097',
+                            200: '#e5d9c5',
+                            100: '#f7f2e7'
+                        },
+                        holy: {
+                            gold: '#d4af37',
+                            goldlight: '#f3e5ab',
+                            crimson: '#8b0000',
+                            blood: '#580000',
+                            blue: '#1e3a8a',
+                            purple: '#4c1d95',
+                            emerald: '#064e3b'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        cinzeldec: ['Cinzel Decorative', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #14100c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3d3126;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+        
+        .glow-gold {
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+        }
+        .glow-crimson {
+            box-shadow: 0 0 25px rgba(139, 0, 0, 0.4);
+        }
+        .glow-blue {
+            box-shadow: 0 0 25px rgba(30, 58, 138, 0.4);
+        }
+        .text-shadow-holy {
+            text-shadow: 0 2px 10px rgba(0,0,0,0.9), 0 0 14px rgba(212, 175, 55, 0.5);
+        }
+        
+        .parchment-card {
+            background: rgba(31, 25, 19, 0.88);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+        }
+        
+        .parchment-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .parchment-card-hover:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .night-mode {
+            background: radial-gradient(circle at top, #181528 0%, #0c0a12 100%);
+        }
+        .day-mode {
+            background: radial-gradient(circle at top, #2b1f18 0%, #14100c 100%);
+        }
+    </style>
+</head>
+<body class="bg-parchment-900 text-parchment-200 min-h-screen font-sans flex flex-col night-mode transition-colors duration-1000">
+
+    <!-- Navigation Header -->
+    <header class="border-b border-holy-gold/30 bg-parchment-900/95 backdrop-blur-md sticky top-0 z-40 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between py-3 gap-3">
+            <!-- Brand Banner -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('setup')">
+                <div class="w-11 h-11 rounded-full bg-holy-crimson border-2 border-holy-gold flex items-center justify-center glow-crimson">
+                    <i class="fa-solid fa-cross text-holy-gold text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzeldec font-bold text-lg md:text-xl text-holy-gold tracking-wider text-shadow-holy">PERSEKUTUAN & PENYESAT</h1>
+                    <p class="text-[10px] text-parchment-300 font-mono tracking-widest uppercase">Biblical Werewolf GM Assistant</p>
+                </div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <nav class="flex space-x-2 bg-parchment-800 p-1.5 rounded-xl border border-parchment-700 w-full md:w-auto justify-center">
+                <button id="nav-setup" onclick="switchTab('setup')" class="px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 bg-holy-gold text-parchment-900 font-extrabold shadow-lg">
+                    <i class="fa-solid fa-users-gear"></i> Pengaturan & Pemain
+                </button>
+                <button id="nav-dashboard" onclick="switchTab('dashboard')" class="px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 text-parchment-300 hover:text-white">
+                    <i class="fa-solid fa-scroll"></i> Game Master Board
+                </button>
+                <button id="nav-guide" onclick="switchTab('guide')" class="px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 text-parchment-300 hover:text-white">
+                    <i class="fa-solid fa-book-bible"></i> Panduan & Peran
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: PENGATURAN & PEMAIN                 -->
+        <!-- ========================================== -->
+        <section id="tab-setup" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Player Registration -->
+                <div class="lg:col-span-5 parchment-card rounded-2xl p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-parchment-700 pb-3">
+                        <h2 class="font-cinzel text-lg font-bold text-holy-gold flex items-center gap-2">
+                            <i class="fa-solid fa-users text-holy-crimson"></i> Daftar Jemaat (<span id="player-count">0</span>)
+                        </h2>
+                        <button onclick="clearAllPlayers()" class="text-xs text-red-400 hover:text-red-300 transition-colors">
+                            <i class="fa-solid fa-trash"></i> Bersihkan All
+                        </button>
+                    </div>
+
+                    <!-- Single Input -->
+                    <div class="flex gap-2">
+                        <input type="text" id="input-player-name" placeholder="Nama Anggota Jemaat..." 
+                            class="bg-parchment-900 border border-parchment-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-holy-gold flex-grow"
+                            onkeypress="if(event.key==='Enter') addSinglePlayer()">
+                        <button onclick="addSinglePlayer()" class="bg-holy-gold hover:bg-yellow-500 text-parchment-900 font-bold px-4 py-2 rounded-lg text-sm transition-all">
+                            <i class="fa-solid fa-plus"></i> Tambah
+                        </button>
+                    </div>
+
+                    <!-- Batch Paste Accordion -->
+                    <details class="bg-parchment-900/60 rounded-lg p-3 border border-parchment-700 text-xs">
+                        <summary class="cursor-pointer text-parchment-300 font-semibold hover:text-holy-gold flex items-center justify-between">
+                            <span><i class="fa-solid fa-paste mr-1"></i> Paste Banyak Nama sekaligus (Pisah Baris)</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </summary>
+                        <div class="mt-3 space-y-2">
+                            <textarea id="bulk-player-input" rows="4" placeholder="Contoh:&#10;Matius&#10;Lukas&#10;Yohanes&#10;Maria&#10;Stefanus" 
+                                class="w-full bg-parchment-900 border border-parchment-700 rounded p-2 text-xs text-white focus:outline-none focus:border-holy-gold"></textarea>
+                            <button onclick="addBulkPlayers()" class="w-full bg-parchment-700 hover:bg-parchment-600 text-white font-semibold py-1.5 rounded transition-colors">
+                                Impor Nama Pemain
+                            </button>
+                        </div>
+                    </details>
+
+                    <!-- Player List -->
+                    <div id="player-list-container" class="space-y-2 max-h-80 overflow-y-auto pr-1">
+                        <div class="text-center py-8 text-parchment-500 text-sm">Belum ada pemain terdaftar.</div>
+                    </div>
+                </div>
+
+                <!-- Right: Biblical Role Config -->
+                <div class="lg:col-span-7 parchment-card rounded-2xl p-6 space-y-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-parchment-700 pb-3 gap-2">
+                        <div>
+                            <h2 class="font-cinzel text-lg font-bold text-holy-gold flex items-center gap-2">
+                                <i class="fa-solid fa-mask text-amber-500"></i> Pilih Peran Tokoh Alkitab
+                            </h2>
+                            <p class="text-xs text-parchment-300">Total Peran Dipilih: <span id="selected-roles-count" class="font-bold text-white">0</span> / <span id="target-player-count" class="font-bold text-holy-gold">0</span> Pemain</p>
+                        </div>
+                        <button onclick="autoBalanceRoles()" class="bg-holy-crimson/90 hover:bg-holy-crimson text-white text-xs px-3 py-2 rounded-lg font-semibold border border-red-500/40 transition-all flex items-center gap-1.5 self-start sm:self-auto">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Rekomendasi Seimbang
+                        </button>
+                    </div>
+
+                    <!-- Roles Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[420px] overflow-y-auto pr-1">
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-bold text-red-400 tracking-wider uppercase border-b border-red-900/50 pb-1">Faksi Penyesat</h3>
+                            <div class="space-y-1.5" id="roles-penyesat-list"></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-bold text-blue-400 tracking-wider uppercase border-b border-blue-900/50 pb-1">Faksi Jemaat Setia</h3>
+                            <div class="space-y-1.5" id="roles-jemaat-list"></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h3 class="text-xs font-bold text-purple-400 tracking-wider uppercase border-b border-purple-900/50 pb-1">Netral & Khusus</h3>
+                            <div class="space-y-1.5" id="roles-netral-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- Mismatch Warning -->
+                    <div id="role-mismatch-alert" class="hidden p-3 rounded-lg bg-red-950/70 border border-red-600/50 text-red-200 text-xs flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-base text-red-400"></i>
+                        <span id="role-mismatch-text">Jumlah peran harus pas dengan jumlah pemain!</span>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="pt-3 border-t border-parchment-700 flex flex-col sm:flex-row gap-3">
+                        <button onclick="shuffleAndAssignRoles()" id="btn-assign-roles" class="flex-1 bg-gradient-to-r from-holy-crimson to-red-900 hover:from-red-800 hover:to-red-950 text-white font-cinzel font-bold py-3 rounded-xl shadow-lg transition-all text-center flex items-center justify-center gap-2 border border-red-500/30">
+                            <i class="fa-solid fa-shuffle"></i> Acak & Intip Kartu Peran
+                        </button>
+                        <button onclick="confirmAndStartGame()" id="btn-start-direct" class="flex-1 bg-gradient-to-r from-holy-gold to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-parchment-900 font-cinzel font-extrabold py-3 rounded-xl shadow-lg transition-all text-center flex items-center justify-center gap-2 border border-yellow-300/40">
+                            <i class="fa-solid fa-play"></i> Mulai Persekutuan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: GAME MASTER BOARD                   -->
+        <!-- ========================================== -->
+        <section id="tab-dashboard" class="hidden space-y-6">
+            
+            <!-- Phase Control Header -->
+            <div class="parchment-card rounded-2xl p-5 border-holy-gold/30 flex flex-col lg:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full lg:w-auto">
+                    <div id="phase-badge-icon" class="w-14 h-14 rounded-2xl bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-indigo-300 text-2xl shadow-lg">
+                        <i class="fa-solid fa-moon"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="phase-title-text" class="font-cinzel text-2xl font-bold text-white tracking-wide">FASE MALAM SUNYI</span>
+                            <span id="phase-round-counter" class="bg-holy-crimson text-white text-xs px-2.5 py-0.5 rounded-full font-mono font-bold">Malam 1</span>
+                        </div>
+                        <p id="phase-subtitle-text" class="text-xs text-parchment-300 mt-0.5">Seluruh jemaat memejamkan mata. Pemandu Game memanggil peran bertindak secara rahasia.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+                    <button onclick="toggleDayNightPhase()" id="btn-toggle-phase" class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-800 to-purple-900 hover:from-indigo-700 hover:to-purple-800 text-white shadow-md border border-indigo-400/30 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-sun text-amber-400"></i> Proses & Ke Fase Siang
+                    </button>
+                    <button onclick="openCupidModal()" id="btn-cupid-setup" class="px-3 py-2.5 rounded-xl font-semibold text-xs bg-parchment-700 hover:bg-parchment-600 text-pink-300 border border-pink-500/30 transition-all flex items-center gap-1.5" title="Atur Pasangan Sejiwa (Priskila & Akwila)">
+                        <i class="fa-solid fa-heart text-pink-500"></i> Pasangan Sejiwa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Counter Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="parchment-card rounded-xl p-4 border-red-900/40 text-center">
+                    <span class="text-xs font-semibold text-parchment-300 uppercase tracking-wider">Sisa Penyesat</span>
+                    <div id="stat-penyesat-count" class="font-cinzel text-3xl font-bold text-red-500 mt-1">0</div>
+                </div>
+                <div class="parchment-card rounded-xl p-4 border-blue-900/40 text-center">
+                    <span class="text-xs font-semibold text-parchment-300 uppercase tracking-wider">Sisa Jemaat</span>
+                    <div id="stat-jemaat-count" class="font-cinzel text-3xl font-bold text-blue-400 mt-1">0</div>
+                </div>
+                <div class="parchment-card rounded-xl p-4 border-purple-900/40 text-center">
+                    <span class="text-xs font-semibold text-parchment-300 uppercase tracking-wider">Sisa Netral</span>
+                    <div id="stat-neutral-count" class="font-cinzel text-3xl font-bold text-purple-400 mt-1">0</div>
+                </div>
+                <div class="parchment-card rounded-xl p-4 border-parchment-700 text-center">
+                    <span class="text-xs font-semibold text-parchment-300 uppercase tracking-wider">Total Hidup</span>
+                    <div id="stat-alive-total" class="font-cinzel text-3xl font-bold text-holy-gold mt-1">0</div>
+                </div>
+            </div>
+
+            <!-- Interactive Night Control & Player Management -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <!-- Night Action Interactive Panel (Active During Night Phase) -->
+                <div id="night-action-panel" class="lg:col-span-12 parchment-card rounded-2xl p-5 border-indigo-500/40 space-y-4">
+                    <div class="flex items-center justify-between border-b border-indigo-900/60 pb-3">
+                        <h3 class="font-cinzel font-bold text-lg text-indigo-300 flex items-center gap-2">
+                            <i class="fa-solid fa-moon text-indigo-400"></i> Panel Aksi Malam Interaktif GM (Protector & Healer Mechanics)
+                        </h3>
+                        <span class="text-xs text-parchment-400 italic">Pilih target aksi peran secara bertahap saat memandu malam</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                        <!-- Yudas Attack Selection -->
+                        <div class="bg-parchment-900/90 p-3.5 rounded-xl border border-red-900/60 space-y-2">
+                            <div class="font-bold text-red-400 flex items-center justify-between">
+                                <span><i class="fa-solid fa-skull-crossbones mr-1"></i> Target Yudas / Penyesat</span>
+                                <span id="yudas-target-badge" class="text-[10px] bg-red-950 text-red-300 px-1.5 py-0.5 rounded border border-red-800">Malam Hari</span>
+                            </div>
+                            <p class="text-[11px] text-parchment-400">Siapa korban yang disepakati kelompok Yudas?</p>
+                            <select id="night-select-yudas-target" onchange="updateNightActionState()" class="w-full bg-parchment-800 border border-red-900/80 rounded p-2 text-white focus:outline-none focus:border-red-500">
+                                <option value="">-- Pilih Korban Yudas --</option>
+                            </select>
+                        </div>
+
+                        <!-- Malaikat Pelindung Protection -->
+                        <div class="bg-parchment-900/90 p-3.5 rounded-xl border border-emerald-900/60 space-y-2">
+                            <div class="font-bold text-emerald-400 flex items-center justify-between">
+                                <span><i class="fa-solid fa-shield-halved mr-1"></i> Malaikat Pelindung</span>
+                                <span id="malaikat-status-badge" class="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800">Aktif</span>
+                            </div>
+                            <p class="text-[11px] text-parchment-400">Pilih 1 pemain untuk dilindungi dari serangan.</p>
+                            <select id="night-select-malaikat-target" onchange="updateNightActionState()" class="w-full bg-parchment-800 border border-emerald-900/80 rounded p-2 text-white focus:outline-none focus:border-emerald-500">
+                                <option value="">-- Tidak Ada / Tidak Melindungi --</option>
+                            </select>
+                        </div>
+
+                        <!-- Lukas sang Tabib Healing -->
+                        <div class="bg-parchment-900/90 p-3.5 rounded-xl border border-teal-900/60 space-y-2">
+                            <div class="font-bold text-teal-300 flex items-center justify-between">
+                                <span><i class="fa-solid fa-user-nurse mr-1"></i> Lukas sang Tabib</span>
+                                <span id="lukas-self-heal-badge" class="text-[10px] bg-teal-950 text-teal-300 px-1.5 py-0.5 rounded border border-teal-800">Self Heal: Siap</span>
+                            </div>
+                            <p class="text-[11px] text-parchment-400">Pilih 1 pemain untuk disembuhkan agar tidak tewas.</p>
+                            <select id="night-select-lukas-target" onchange="updateNightActionState()" class="w-full bg-parchment-800 border border-teal-900/80 rounded p-2 text-white focus:outline-none focus:border-teal-500">
+                                <option value="">-- Tidak Ada / Tidak Sembuhkan --</option>
+                            </select>
+                        </div>
+
+                        <!-- Maria Magdalena Urapan -->
+                        <div class="bg-parchment-900/90 p-3.5 rounded-xl border border-pink-900/60 space-y-2">
+                            <div class="font-bold text-pink-400 flex items-center justify-between">
+                                <span><i class="fa-solid fa-flask mr-1"></i> Maria Magdalena</span>
+                                <span id="maria-potions-badge" class="text-[10px] bg-pink-950 text-pink-300 px-1.5 py-0.5 rounded border border-pink-800">Ramuan Siap</span>
+                            </div>
+                            
+                            <!-- Urapan Kehidupan -->
+                            <div class="space-y-1 pt-1">
+                                <label class="flex items-center gap-1.5 text-[11px] text-parchment-300 cursor-pointer">
+                                    <input type="checkbox" id="chk-maria-heal" onchange="updateNightActionState()" class="rounded bg-parchment-800 border-pink-700 text-pink-500 focus:ring-0">
+                                    <span>Gunakan <strong>Urapan Kehidupan</strong> (Sembuhkan Target Yudas)</span>
+                                </label>
+                            </div>
+
+                            <!-- Urapan Penghukuman -->
+                            <div class="space-y-1">
+                                <span class="text-[10px] text-parchment-400 block">Urapan Penghukuman (Racun/Eliminasi):</span>
+                                <select id="night-select-maria-poison-target" onchange="updateNightActionState()" class="w-full bg-parchment-800 border border-pink-900/80 rounded p-1.5 text-[11px] text-white focus:outline-none focus:border-pink-500">
+                                    <option value="">-- Jangan Gunakan Racun --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Player Grid (Left) -->
+                <div class="lg:col-span-8 parchment-card rounded-2xl p-6 space-y-4">
+                    <div class="flex items-center justify-between border-b border-parchment-700 pb-3">
+                        <h3 class="font-cinzel font-bold text-lg text-holy-gold flex items-center gap-2">
+                            <i class="fa-solid fa-address-card"></i> Status & Tindakan Pemain
+                        </h3>
+                        <span class="text-xs text-parchment-300">Pemandu Game Control Panel</span>
+                    </div>
+
+                    <div id="dashboard-players-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[520px] overflow-y-auto pr-1">
+                        <!-- Dynamic Cards -->
+                    </div>
+                </div>
+
+                <!-- Night Sequence Checklist & Logs (Right) -->
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Checklist -->
+                    <div class="parchment-card rounded-2xl p-5 space-y-3 border-indigo-900/40">
+                        <h4 class="font-cinzel font-bold text-sm text-indigo-300 flex items-center justify-between">
+                            <span><i class="fa-solid fa-list-check mr-2"></i> Urutan Panggilan Malam</span>
+                            <i class="fa-solid fa-moon text-xs"></i>
+                        </h4>
+                        <div id="night-call-sequence" class="space-y-1.5 text-xs"></div>
+                    </div>
+
+                    <!-- Logs -->
+                    <div class="parchment-card rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center justify-between border-b border-parchment-700 pb-2">
+                            <h4 class="font-cinzel font-bold text-sm text-holy-gold flex items-center gap-2">
+                                <i class="fa-solid fa-scroll"></i> Catatan Peristiwa (Log)
+                            </h4>
+                        </div>
+                        <div id="game-logs-container" class="space-y-2 max-h-64 overflow-y-auto text-xs text-parchment-200 pr-1">
+                            <div class="text-parchment-500 italic">Belum ada peristiwa terjadi.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: PANDUAN & 15 PERAN TOKOH ALKITAB     -->
+        <!-- ========================================== -->
+        <section id="tab-guide" class="hidden space-y-6">
+            <div class="parchment-card rounded-2xl p-6 border-holy-gold/30 space-y-4">
+                <h2 class="font-cinzel text-2xl font-bold text-holy-gold flex items-center gap-3">
+                    <i class="fa-solid fa-book-bible text-holy-crimson"></i> Panduan Teknis Game Persekutuan & Penyesat
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-parchment-200 leading-relaxed">
+                    <div class="bg-parchment-900/70 p-4 rounded-xl border border-parchment-700 space-y-2">
+                        <h3 class="font-bold text-holy-gold text-base flex items-center gap-2">
+                            <i class="fa-solid fa-moon text-indigo-400"></i> A. Fase Malam Sunyi
+                        </h3>
+                        <p class="text-xs text-parchment-300">
+                            Pemandu Game memberi instruksi tidur. Peran khusus dipanggil bertahap tanpa suara:<br>
+                            • <strong>Priskila & Akwila:</strong> Menunjuk 2 Pasangan Sejiwa (Malam 1).<br>
+                            • <strong>Rasul Paulus:</strong> Menunjuk 1 pemain untuk ditebak.<br>
+                            • <strong>Kelompok Yudas:</strong> Menyepakati 1 korban penyesat.<br>
+                            • <strong>Malaikat Pelindung / Lukas sang Tabib / Maria Magdalena:</strong> Menggunakan perlindungan & penyembuhan pada malam hari.
+                        </p>
+                    </div>
+
+                    <div class="bg-parchment-900/70 p-4 rounded-xl border border-parchment-700 space-y-2">
+                        <h3 class="font-bold text-holy-gold text-base flex items-center gap-2">
+                            <i class="fa-solid fa-sun text-amber-400"></i> B. Fase Musyawarah Siang
+                        </h3>
+                        <p class="text-xs text-parchment-300">
+                            • <strong>Pengumuman:</strong> Pemandu Game mengumumkan korban malam.<br>
+                            • <strong>Debat:</strong> Musyawarah jemaat selama 3–5 menit.<br>
+                            • <strong>Pengadilan / Voting:</strong> Pemungutan suara untuk mengeksekusi 1 orang yang dicurigai sebagai penyesat.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role Directory Filter & Search -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1">
+                    <button onclick="filterRoleCards('all')" class="role-filter-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-holy-gold text-parchment-900">Semua Tokoh (15)</button>
+                    <button onclick="filterRoleCards('penyesat')" class="role-filter-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-parchment-800 text-red-400 border border-red-900">Penyesat</button>
+                    <button onclick="filterRoleCards('jemaat')" class="role-filter-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-parchment-800 text-blue-400 border border-blue-900">Jemaat Setia</button>
+                    <button onclick="filterRoleCards('netral')" class="role-filter-btn px-4 py-1.5 rounded-lg text-xs font-bold bg-parchment-800 text-purple-400 border border-purple-900">Netral</button>
+                </div>
+                <div class="relative w-full sm:w-64">
+                    <input type="text" id="search-role-input" onkeyup="searchRoleCards()" placeholder="Cari nama tokoh / role..." 
+                        class="w-full bg-parchment-900 border border-parchment-700 rounded-lg pl-9 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-holy-gold">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-parchment-500"></i>
+                </div>
+            </div>
+
+            <!-- 15 Role Cards Grid -->
+            <div id="role-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODALS SECTION -->
+    <!-- Secret Role Reveal Modal -->
+    <div id="modal-secret-roles" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="parchment-card max-w-2xl w-full rounded-2xl p-6 border-holy-gold/40 space-y-5 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-parchment-700 pb-3">
+                <h3 class="font-cinzel text-xl font-bold text-holy-gold flex items-center gap-2">
+                    <i class="fa-solid fa-eye-slash text-holy-crimson"></i> Pembagian Kartu Peran Rahasia
+                </h3>
+                <button onclick="closeSecretModal()" class="text-parchment-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <p class="text-xs text-parchment-300">
+                Oper perangkat ini ke masing-masing anggota secara bergantian. Setiap pemain dapat menekan tombol untuk mengintip peran tokoh Alkitab mereka secara pribadi.
+            </p>
+
+            <div id="secret-cards-container" class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto p-1 flex-grow">
+                <!-- Dynamic Player Cards -->
+            </div>
+
+            <div class="pt-3 border-t border-parchment-700 flex justify-end gap-3">
+                <button onclick="closeSecretModal()" class="px-5 py-2.5 rounded-xl bg-parchment-700 text-white font-semibold text-xs hover:bg-parchment-600">
+                    Tutup
+                </button>
+                <button onclick="confirmAndStartGame()" class="px-5 py-2.5 rounded-xl bg-holy-gold text-parchment-900 font-extrabold text-xs hover:bg-yellow-500">
+                    Mulai Persekutuan Sekarang <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Priskila & Akwila Soulmate Modal -->
+    <div id="modal-cupid" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="parchment-card max-w-md w-full rounded-2xl p-6 border-pink-500/40 space-y-4">
+            <h3 class="font-cinzel text-lg font-bold text-pink-400 flex items-center gap-2">
+                <i class="fa-solid fa-heart text-pink-500"></i> Ikat Pasangan Sejiwa (Priskila & Akwila)
+            </h3>
+            <p class="text-xs text-parchment-300">
+                Pilih 2 anggota jemaat yang diikat oleh Priskila & Akwila pada Malam Pertama. Jika salah satu gugur, satunya langsung gugur karena patah hati.
+            </p>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-parchment-400 block mb-1">Pasangan Pertama:</label>
+                    <select id="select-lover-1" class="w-full bg-parchment-900 border border-parchment-700 rounded-lg p-2 text-xs text-white focus:border-pink-500"></select>
+                </div>
+                <div>
+                    <label class="text-xs text-parchment-400 block mb-1">Pasangan Kedua:</label>
+                    <select id="select-lover-2" class="w-full bg-parchment-900 border border-parchment-700 rounded-lg p-2 text-xs text-white focus:border-pink-500"></select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeCupidModal()" class="px-4 py-2 rounded-lg bg-parchment-800 text-parchment-300 text-xs">Batal</button>
+                <button onclick="saveCupidLovers()" class="px-4 py-2 rounded-lg bg-pink-600 text-white font-bold text-xs hover:bg-pink-500">Ikat Pasangan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rasul Petrus Retaliation Modal -->
+    <div id="modal-petrus" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="parchment-card max-w-md w-full rounded-2xl p-6 border-red-600/50 space-y-4 text-center">
+            <div class="w-16 h-16 bg-red-950 border-2 border-red-500 rounded-full flex items-center justify-center text-red-500 text-2xl mx-auto glow-crimson">
+                <i class="fa-solid fa-crosshairs"></i>
+            </div>
+            <h3 class="font-cinzel text-xl font-bold text-red-400">RASUL PETRUS GUGUR!</h3>
+            <p class="text-xs text-parchment-300">
+                Rasul Petrus memiliki keberanian tegas! Ia berhak langsung membawa/menembak 1 pemain lain untuk ikut gugur bersamanya. Siapa yang dipilih?
+            </p>
+            <select id="select-petrus-target" class="w-full bg-parchment-900 border border-red-800 rounded-lg p-2.5 text-xs text-white focus:border-red-500">
+            </select>
+            <button onclick="executePetrusShot()" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all">
+                Bawa Pemain Ini Gugur Bersama!
+            </button>
+        </div>
+    </div>
+
+    <!-- Victory Modal -->
+    <div id="modal-victory" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="parchment-card max-w-xl w-full rounded-2xl p-6 border-holy-gold text-center space-y-5 glow-gold">
+            <div id="victory-icon-container" class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto">
+                <i id="victory-icon" class="fa-solid fa-trophy"></i>
+            </div>
+
+            <div>
+                <h2 id="victory-title" class="font-cinzel text-2xl sm:text-3xl font-extrabold text-holy-gold tracking-widest text-shadow-holy">FAKSI JEMAAT MENANG!</h2>
+                <p id="victory-subtitle" class="text-xs text-parchment-300 mt-2">Kebenaran dan iman telah menang atas para penyesat!</p>
+            </div>
+
+            <div class="bg-parchment-900/80 rounded-xl p-3 border border-parchment-700 max-h-52 overflow-y-auto text-left text-xs space-y-1">
+                <div class="font-bold text-holy-gold border-b border-parchment-700 pb-1 mb-2">Rekapitulasi Peran Pemain:</div>
+                <div id="victory-recap-list" class="space-y-1"></div>
+            </div>
+
+            <button onclick="restartGame()" class="w-full bg-gradient-to-r from-holy-gold to-yellow-600 text-parchment-900 font-cinzel font-extrabold py-3 rounded-xl text-sm shadow-xl hover:from-yellow-400 hover:to-yellow-600 transition-all">
+                <i class="fa-solid fa-rotate-right mr-1"></i> Main Lagi / Restart Game
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC ENGINE -->
+    <script>
+        // --- ALL 15 BIBLICAL ROLES DATA DEFINITION ---
+        const ROLES_DATA = {
+            // Faksi Antagonis (Penyesat)
+            yudas: { name: "Yudas Iskariot", origName: "Werewolf", faction: "penyesat", icon: "fa-mask", color: "text-red-500", desc: "Bangun setiap malam bersama pengikut Yudas lainnya untuk menyepakati 1 pengikut yang akan disingkirkan/dieliminasi dari persekutuan." },
+            yulius: { name: "Yulius sang Perwira", origName: "Alpha Werewolf", faction: "penyesat", icon: "fa-shield-cat", color: "text-red-600", desc: "Bertindak sebagai kelompok antagonis. Memiliki kemampuan khusus 1 kali dalam permainan untuk mengubah korban malam hari menjadi penyesat baru." },
+            barabas: { name: "Barabas", origName: "Wolf Cub", faction: "penyesat", icon: "fa-skull-crossbones", color: "text-red-400", desc: "Anggota faksi penyesat. Jika Barabas diadili dan dieksekusi di siang hari, malam berikutnya kelompok penyesat membalas dendam dengan menyingkirkan 2 orang sekaligus." },
+            iblis: { name: "Iblis / Penguji", origName: "Sorceress / Wolf Seer", faction: "penyesat", icon: "fa-hat-wizard", color: "text-purple-400", desc: "Sekutu kelompok Yudas. Bangun di malam hari untuk mengintip peran pemain lain guna menemukan Rasul Paulus agar bisa disingkirkan." },
+
+            // Faksi Jemaat / Village
+            jemaat: { name: "Jemaat Mula-mula", origName: "Villager", faction: "jemaat", icon: "fa-users", color: "text-blue-400", desc: "Warga biasa tanpa kemampuan khusus malam hari. Bertugas aktif berdiskusi dan memberikan voting di siang hari untuk mengadili penyesat." },
+            paulus: { name: "Rasul Paulus", origName: "Seer / Fortune Teller", faction: "jemaat", icon: "fa-eye", color: "text-cyan-400", desc: "Memiliki karunia marifat. Bangun setiap malam untuk mengintip 1 pemain. GM memberi petunjuk apakah ia Penyesat atau Jemaat Setia." },
+            malaikat: { name: "Malaikat Pelindung", origName: "Bodyguard", faction: "jemaat", icon: "fa-shield-halved", color: "text-emerald-400", desc: "Bangun setiap malam untuk melindungi 1 pemain dari serangan kelompok penyesat." },
+            lukas: { name: "Lukas sang Tabib", origName: "Doctor / Priest", faction: "jemaat", icon: "fa-user-nurse", color: "text-teal-300", desc: "Bangun di malam hari untuk menyembuhkan 1 pemain yang diserang. Memiliki kesempatan menyelamatkan diri sendiri 1 kali." },
+            petrus: { name: "Rasul Petrus", origName: "Hunter", faction: "jemaat", icon: "fa-crosshairs", color: "text-amber-500", desc: "Memiliki sifat tegas dan pemberani. Jika Petrus tewas, ia berhak langsung membawa/menembak 1 pemain lain untuk ikut gugur bersamanya." },
+            maria: { name: "Maria Magdalena", origName: "Witch", faction: "jemaat", icon: "fa-flask text-pink-400", color: "text-pink-400", desc: "Memiliki Urapan Kehidupan (menyembuhkan korban malam) dan Urapan Penghukuman (menyingkirkan 1 pemain)." },
+            yohanes: { name: "Rasul Yohanes", origName: "Medium", faction: "jemaat", icon: "fa-scroll", color: "text-indigo-300", desc: "Bangun di malam hari untuk mengetahui peran sebenarnya dari pemain yang baru saja dieksekusi di siang hari sebelumnya." },
+            yakobus: { name: "Rasul Yakobus", origName: "Mayor", faction: "jemaat", icon: "fa-crown", color: "text-yellow-400", desc: "Tokoh jemaat terpandang. Saat pemungutan suara (voting) di siang hari, suaranya dihitung bernilai 2 suara." },
+
+            // Faksi Netral / Special
+            saulus: { name: "Saulus", origName: "Fool / Tanner", faction: "netral", icon: "fa-masks-theater", color: "text-amber-400", desc: "Saulus sebelum bertobat. Memiliki kondisi menang sendiri secara unik: Tujuan utamanya adalah membuat dirinya dieksekusi warga di siang hari." },
+            priskila_akwila: { name: "Priskila & Akwila", origName: "Cupid", faction: "netral", icon: "fa-heart", color: "text-pink-500", desc: "Pada malam pertama memilih 2 pemain untuk dijadikan Pasangan Sejiwa. Jika salah satu tewas, satunya ikut gugur." },
+            tomas: { name: "Tomas", origName: "Lycan", faction: "netral", icon: "fa-question-circle", color: "text-gray-400", desc: "Bagian dari Jemaat Setia, namun karena sifat peragunya, jika Rasul Paulus mengintip Tomas, GM akan memberitahu bahwa Tomas adalah Penyesat." }
+        };
+
+        // --- GLOBAL APP ENGINE STATE ---
+        let gameState = {
+            players: [], // { id, name, roleKey, alive: true, causeOfDeath: null, lovers: false }
+            phase: 'night', // 'night' | 'day'
+            roundCount: 1,
+            barabasTriggered: false, // Double kill trigger
+            
+            // Protector & Healer Mechanics State
+            nightActions: {
+                yudasTargetId: "",
+                malaikatProtectedId: "",
+                lastMalaikatProtectedId: "",
+                lukasHealedId: "",
+                lukasSelfHealUsed: false,
+                mariaHealUsed: false,
+                mariaPoisonUsed: false,
+                mariaHealActive: false,
+                mariaPoisonTargetId: ""
+            },
+
+            logs: [],
+            isGameOver: false
+        };
+
+        // Initialize App
+        window.onload = function() {
+            renderSetupRoleCheckboxes();
+            renderGuideRoleCards();
+            updateSetupPlayerUI();
+        };
+
+        // Web Audio Synthesizer Effects
+        function playSoundEffect(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'night') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(110, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 1.2);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 1.2);
+                } else if (type === 'day') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(392, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(784, ctx.currentTime + 0.9);
+                    gain.gain.setValueAtTime(0.35, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.9);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.9);
+                } else if (type === 'death') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(35, ctx.currentTime + 1.4);
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.4);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 1.4);
+                }
+            } catch (e) {
+                console.log("Audio non-interactive");
+            }
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tabName) {
+            document.getElementById('tab-setup').classList.add('hidden');
+            document.getElementById('tab-dashboard').classList.add('hidden');
+            document.getElementById('tab-guide').classList.add('hidden');
+
+            document.getElementById('nav-setup').className = "px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 text-parchment-300 hover:text-white";
+            document.getElementById('nav-dashboard').className = "px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 text-parchment-300 hover:text-white";
+            document.getElementById('nav-guide').className = "px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 text-parchment-300 hover:text-white";
+
+            if (tabName === 'setup') {
+                document.getElementById('tab-setup').classList.remove('hidden');
+                document.getElementById('nav-setup').className = "px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 bg-holy-gold text-parchment-900 font-extrabold shadow-lg";
+            } else if (tabName === 'dashboard') {
+                document.getElementById('tab-dashboard').classList.remove('hidden');
+                document.getElementById('nav-dashboard').className = "px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 bg-holy-gold text-parchment-900 font-extrabold shadow-lg";
+            } else if (tabName === 'guide') {
+                document.getElementById('tab-guide').classList.remove('hidden');
+                document.getElementById('nav-guide').className = "px-4 py-2 rounded-lg font-medium text-xs md:text-sm transition-all flex items-center gap-2 bg-holy-gold text-parchment-900 font-extrabold shadow-lg";
+            }
+        }
+
+        // --- SETUP TAB LOGIC ---
+        function addSinglePlayer() {
+            const input = document.getElementById('input-player-name');
+            const name = input.value.trim();
+            if (!name) return;
+
+            gameState.players.push({
+                id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                name: name,
+                roleKey: null,
+                alive: true,
+                causeOfDeath: null,
+                lovers: false
+            });
+
+            input.value = '';
+            updateSetupPlayerUI();
+        }
+
+        function addBulkPlayers() {
+            const textarea = document.getElementById('bulk-player-input');
+            const lines = textarea.value.split('\n');
+            lines.forEach(line => {
+                const name = line.trim();
+                if (name) {
+                    gameState.players.push({
+                        id: 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        name: name,
+                        roleKey: null,
+                        alive: true,
+                        causeOfDeath: null,
+                        lovers: false
+                    });
+                }
+            });
+            textarea.value = '';
+            updateSetupPlayerUI();
+        }
+
+        function removePlayer(id) {
+            gameState.players = gameState.players.filter(p => p.id !== id);
+            updateSetupPlayerUI();
+        }
+
+        function clearAllPlayers() {
+            if (confirm("Kosongkan seluruh daftar anggota jemaat?")) {
+                gameState.players = [];
+                updateSetupPlayerUI();
+            }
+        }
+
+        function updateSetupPlayerUI() {
+            const container = document.getElementById('player-list-container');
+            document.getElementById('player-count').innerText = gameState.players.length;
+            document.getElementById('target-player-count').innerText = gameState.players.length;
+
+            if (gameState.players.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-parchment-500 text-sm">Belum ada pemain terdaftar.</div>`;
+                updateSelectedRoleCount();
+                return;
+            }
+
+            container.innerHTML = gameState.players.map((p, idx) => `
+                <div class="flex items-center justify-between bg-parchment-900/80 p-2.5 rounded-lg border border-parchment-700">
+                    <span class="text-xs font-semibold text-parchment-200"><span class="text-holy-gold font-mono mr-2">${idx + 1}.</span>${p.name}</span>
+                    <button onclick="removePlayer('${p.id}')" class="text-parchment-500 hover:text-red-400 text-xs px-2 py-1">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            updateSelectedRoleCount();
+        }
+
+        function renderSetupRoleCheckboxes() {
+            const penyesatContainer = document.getElementById('roles-penyesat-list');
+            const jemaatContainer = document.getElementById('roles-jemaat-list');
+            const netralContainer = document.getElementById('roles-netral-list');
+
+            let penyesatHTML = '', jemaatHTML = '', netralHTML = '';
+
+            Object.keys(ROLES_DATA).forEach(key => {
+                const r = ROLES_DATA[key];
+                const itemHTML = `
+                    <label class="flex items-center gap-2 p-1.5 rounded bg-parchment-900/50 border border-parchment-800 hover:border-parchment-700 cursor-pointer text-xs">
+                        <input type="checkbox" id="role-chk-${key}" value="${key}" onchange="updateSelectedRoleCount()" class="role-checkbox rounded bg-parchment-900 border-parchment-700 text-holy-gold focus:ring-0">
+                        <span class="${r.color} font-medium"><i class="fa-solid ${r.icon} mr-1"></i> ${r.name}</span>
+                    </label>
+                `;
+                if (r.faction === 'penyesat') penyesatHTML += itemHTML;
+                else if (r.faction === 'jemaat') jemaatHTML += itemHTML;
+                else netralHTML += itemHTML;
+            });
+
+            penyesatContainer.innerHTML = penyesatHTML;
+            jemaatContainer.innerHTML = jemaatHTML;
+            netralContainer.innerHTML = netralHTML;
+
+            // Default Check Standard Roles
+            document.getElementById('role-chk-yudas').checked = true;
+            document.getElementById('role-chk-paulus').checked = true;
+            document.getElementById('role-chk-malaikat').checked = true;
+            document.getElementById('role-chk-lukas').checked = true;
+            document.getElementById('role-chk-maria').checked = true;
+            document.getElementById('role-chk-jemaat').checked = true;
+        }
+
+        function getSelectedRolesList() {
+            const checkboxes = document.querySelectorAll('.role-checkbox:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function updateSelectedRoleCount() {
+            const selected = getSelectedRolesList();
+            const totalPlayers = gameState.players.length;
+            document.getElementById('selected-roles-count').innerText = selected.length;
+
+            const alertBox = document.getElementById('role-mismatch-alert');
+            if (selected.length !== totalPlayers) {
+                alertBox.classList.remove('hidden');
+                document.getElementById('role-mismatch-text').innerText = `Jumlah peran (${selected.length}) harus pas dengan jumlah pemain (${totalPlayers})!`;
+            } else {
+                alertBox.classList.add('hidden');
+            }
+        }
+
+        function autoBalanceRoles() {
+            const count = gameState.players.length;
+            if (count < 4) {
+                alert("Tambahkan minimal 4-5 pemain untuk auto recommendation.");
+                return;
+            }
+
+            document.querySelectorAll('.role-checkbox').forEach(cb => cb.checked = false);
+
+            let selected = [];
+            if (count <= 6) {
+                selected = ['yudas', 'paulus', 'malaikat', 'lukas', 'jemaat', 'jemaat'];
+            } else if (count <= 9) {
+                selected = ['yudas', 'yulius', 'paulus', 'malaikat', 'lukas', 'maria', 'saulus', 'jemaat', 'jemaat'];
+            } else if (count <= 12) {
+                selected = ['yudas', 'yulius', 'iblis', 'paulus', 'malaikat', 'lukas', 'maria', 'petrus', 'priskila_akwila', 'jemaat', 'jemaat', 'jemaat'];
+            } else {
+                selected = ['yudas', 'yulius', 'barabas', 'iblis', 'paulus', 'malaikat', 'lukas', 'maria', 'petrus', 'yakobus', 'yohanes', 'saulus', 'priskila_akwila', 'tomas', 'jemaat'];
+            }
+
+            while (selected.length > count) selected.pop();
+            while (selected.length < count) selected.push('jemaat');
+
+            selected.forEach(k => {
+                const cb = document.getElementById(`role-chk-${k}`);
+                if (cb) cb.checked = true;
+            });
+
+            updateSelectedRoleCount();
+        }
+
+        // --- SHUFFLE & ASSIGNMENT ---
+        function shuffleAndAssignRoles() {
+            const rolesList = getSelectedRolesList();
+            if (rolesList.length !== gameState.players.length || gameState.players.length === 0) {
+                alert("Jumlah peran tidak sesuai dengan jumlah anggota jemaat!");
+                return;
+            }
+
+            const shuffled = [...rolesList];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+
+            gameState.players.forEach((player, idx) => {
+                player.roleKey = shuffled[idx];
+            });
+
+            openSecretModal();
+        }
+
+        function openSecretModal() {
+            const container = document.getElementById('secret-cards-container');
+            container.innerHTML = gameState.players.map(p => {
+                const r = ROLES_DATA[p.roleKey];
+                return `
+                    <div class="bg-parchment-900 border border-parchment-700 rounded-xl p-3 flex flex-col justify-between text-center space-y-2">
+                        <span class="text-xs font-bold text-holy-gold truncate">${p.name}</span>
+                        <div id="secret-role-view-${p.id}" class="hidden py-3 bg-parchment-800 rounded-lg border border-parchment-600 space-y-1">
+                            <i class="fa-solid ${r.icon} ${r.color} text-2xl mb-1"></i>
+                            <div class="text-xs font-bold ${r.color}">${r.name}</div>
+                            <div class="text-[10px] text-parchment-400 capitalize">Role Asli: ${r.origName}</div>
+                        </div>
+                        <button onclick="toggleSecretRoleView('${p.id}')" id="btn-reveal-${p.id}" class="w-full bg-parchment-800 hover:bg-parchment-700 text-parchment-200 text-[11px] font-semibold py-1.5 rounded transition-all">
+                            <i class="fa-solid fa-eye mr-1"></i> Intip Kartu
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('modal-secret-roles').classList.remove('hidden');
+        }
+
+        function toggleSecretRoleView(playerId) {
+            const view = document.getElementById(`secret-role-view-${playerId}`);
+            const btn = document.getElementById(`btn-reveal-${playerId}`);
+            if (view.classList.contains('hidden')) {
+                view.classList.remove('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-eye-slash mr-1"></i> Sembunyikan`;
+                btn.classList.replace('bg-parchment-800', 'bg-red-950');
+            } else {
+                view.classList.add('hidden');
+                btn.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> Intip Kartu`;
+                btn.classList.replace('bg-red-950', 'bg-parchment-800');
+            }
+        }
+
+        function closeSecretModal() {
+            document.getElementById('modal-secret-roles').classList.add('hidden');
+        }
+
+        function confirmAndStartGame() {
+            const rolesList = getSelectedRolesList();
+            if (rolesList.length !== gameState.players.length || gameState.players.length === 0) {
+                alert("Silakan atur pemain dan perannya terlebih dahulu.");
+                return;
+            }
+
+            if (!gameState.players[0].roleKey) {
+                shuffleAndAssignRoles();
+                return;
+            }
+
+            closeSecretModal();
+            gameState.phase = 'night';
+            gameState.roundCount = 1;
+            gameState.logs = [];
+            gameState.isGameOver = false;
+
+            // Reset Protector & Healer States
+            gameState.nightActions = {
+                yudasTargetId: "",
+                malaikatProtectedId: "",
+                lastMalaikatProtectedId: "",
+                lukasHealedId: "",
+                lukasSelfHealUsed: false,
+                mariaHealUsed: false,
+                mariaPoisonUsed: false,
+                mariaHealActive: false,
+                mariaPoisonTargetId: ""
+            };
+
+            addLog(`Persekutuan Dimulai! Memasuki Fase Malam Sunyi 1.`);
+            switchTab('dashboard');
+            renderDashboardUI();
+            playSoundEffect('night');
+        }
+
+        // --- PROTECTOR & HEALER INTERACTIVE MECHANICS ---
+        function populateNightActionDropdowns() {
+            const livingPlayers = gameState.players.filter(p => p.alive);
+            const aliveOptions = `<option value="">-- Tidak Ada / Pilih --</option>` + 
+                livingPlayers.map(p => `<option value="${p.id}">${p.name} (${ROLES_DATA[p.roleKey].name})</option>`).join('');
+
+            // Yudas Attack Target Select
+            const yudasSelect = document.getElementById('night-select-yudas-target');
+            yudasSelect.innerHTML = aliveOptions;
+            yudasSelect.value = gameState.nightActions.yudasTargetId || "";
+
+            // Malaikat Pelindung Protection Select
+            const malaikatSelect = document.getElementById('night-select-malaikat-target');
+            const malaikatPlayer = gameState.players.find(p => p.alive && p.roleKey === 'malaikat');
+            if (malaikatPlayer) {
+                malaikatSelect.disabled = false;
+                // Exclude last protected if applicable
+                const availableForMalaikat = livingPlayers.filter(p => p.id !== gameState.nightActions.lastMalaikatProtectedId);
+                malaikatSelect.innerHTML = `<option value="">-- Tidak Ada / Tidak Melindungi --</option>` + 
+                    availableForMalaikat.map(p => `<option value="${p.id}">${p.name} (${ROLES_DATA[p.roleKey].name})</option>`).join('');
+                malaikatSelect.value = gameState.nightActions.malaikatProtectedId || "";
+                document.getElementById('malaikat-status-badge').innerText = "Aktif";
+                document.getElementById('malaikat-status-badge').className = "text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800";
+            } else {
+                malaikatSelect.innerHTML = `<option value="">-- Malaikat Gugur / Tidak Ada --</option>`;
+                malaikatSelect.disabled = true;
+                document.getElementById('malaikat-status-badge').innerText = "Tidak Aktif";
+                document.getElementById('malaikat-status-badge').className = "text-[10px] bg-gray-900 text-gray-500 px-1.5 py-0.5 rounded border border-gray-800";
+            }
+
+            // Lukas sang Tabib Healing Select
+            const lukasSelect = document.getElementById('night-select-lukas-target');
+            const lukasPlayer = gameState.players.find(p => p.alive && p.roleKey === 'lukas');
+            if (lukasPlayer) {
+                lukasSelect.disabled = false;
+                // Lukas can heal self only 1x
+                const availableForLukas = livingPlayers.filter(p => p.id !== lukasPlayer.id || !gameState.nightActions.lukasSelfHealUsed);
+                lukasSelect.innerHTML = `<option value="">-- Tidak Ada / Tidak Sembuhkan --</option>` + 
+                    availableForLukas.map(p => `<option value="${p.id}">${p.name} (${ROLES_DATA[p.roleKey].name})</option>`).join('');
+                lukasSelect.value = gameState.nightActions.lukasHealedId || "";
+                
+                const selfHealBadge = document.getElementById('lukas-self-heal-badge');
+                selfHealBadge.innerText = gameState.nightActions.lukasSelfHealUsed ? "Self Heal: Habis" : "Self Heal: Siap";
+                selfHealBadge.className = gameState.nightActions.lukasSelfHealUsed 
+                    ? "text-[10px] bg-red-950 text-red-400 px-1.5 py-0.5 rounded border border-red-900"
+                    : "text-[10px] bg-teal-950 text-teal-300 px-1.5 py-0.5 rounded border border-teal-800";
+            } else {
+                lukasSelect.innerHTML = `<option value="">-- Lukas Gugur / Tidak Ada --</option>`;
+                lukasSelect.disabled = true;
+                document.getElementById('lukas-self-heal-badge').innerText = "Tidak Aktif";
+                document.getElementById('lukas-self-heal-badge').className = "text-[10px] bg-gray-900 text-gray-500 px-1.5 py-0.5 rounded border border-gray-800";
+            }
+
+            // Maria Magdalena Urapan
+            const mariaPlayer = gameState.players.find(p => p.alive && p.roleKey === 'maria');
+            const chkHeal = document.getElementById('chk-maria-heal');
+            const poisonSelect = document.getElementById('night-select-maria-poison-target');
+            const mariaBadge = document.getElementById('maria-potions-badge');
+
+            if (mariaPlayer) {
+                chkHeal.disabled = gameState.nightActions.mariaHealUsed;
+                chkHeal.checked = gameState.nightActions.mariaHealActive && !gameState.nightActions.mariaHealUsed;
+
+                if (gameState.nightActions.mariaPoisonUsed) {
+                    poisonSelect.innerHTML = `<option value="">-- Urapan Racun Telah Terpakai --</option>`;
+                    poisonSelect.disabled = true;
+                } else {
+                    poisonSelect.disabled = false;
+                    poisonSelect.innerHTML = `<option value="">-- Jangan Gunakan Racun --</option>` + 
+                        livingPlayers.map(p => `<option value="${p.id}">${p.name} (${ROLES_DATA[p.roleKey].name})</option>`).join('');
+                    poisonSelect.value = gameState.nightActions.mariaPoisonTargetId || "";
+                }
+
+                let statusText = [];
+                if (gameState.nightActions.mariaHealUsed) statusText.push("Sembuh (Habis)");
+                else statusText.push("Sembuh (Siap)");
+
+                if (gameState.nightActions.mariaPoisonUsed) statusText.push("Racun (Habis)");
+                else statusText.push("Racun (Siap)");
+
+                mariaBadge.innerText = statusText.join(" | ");
+            } else {
+                chkHeal.disabled = true;
+                chkHeal.checked = false;
+                poisonSelect.innerHTML = `<option value="">-- Maria Gugur / Tidak Ada --</option>`;
+                poisonSelect.disabled = true;
+                mariaBadge.innerText = "Tidak Aktif";
+            }
+        }
+
+        function updateNightActionState() {
+            gameState.nightActions.yudasTargetId = document.getElementById('night-select-yudas-target').value;
+            gameState.nightActions.malaikatProtectedId = document.getElementById('night-select-malaikat-target').value;
+            gameState.nightActions.lukasHealedId = document.getElementById('night-select-lukas-target').value;
+            gameState.nightActions.mariaHealActive = document.getElementById('chk-maria-heal').checked;
+            gameState.nightActions.mariaPoisonTargetId = document.getElementById('night-select-maria-poison-target').value;
+        }
+
+        // Resolves night actions when switching from Night -> Day
+        function processNightResolution() {
+            const actions = gameState.nightActions;
+            let casualties = [];
+            let savedPlayers = [];
+
+            const yudasTarget = gameState.players.find(p => p.id === actions.yudasTargetId && p.alive);
+
+            if (yudasTarget) {
+                let isSaved = false;
+
+                // Protection 1: Malaikat Pelindung
+                if (actions.malaikatProtectedId === yudasTarget.id) {
+                    isSaved = true;
+                    addLog(`🛡️ Malaikat Pelindung berhasil melindungi ${yudasTarget.name} dari serangan Yudas!`);
+                }
+
+                // Protection 2: Lukas sang Tabib
+                if (actions.lukasHealedId === yudasTarget.id) {
+                    isSaved = true;
+                    addLog(`🩺 Lukas sang Tabib berhasil menyembuhkan ${yudasTarget.name}!`);
+
+                    // Track self heal usage
+                    const lukasPlayer = gameState.players.find(p => p.roleKey === 'lukas');
+                    if (lukasPlayer && lukasPlayer.id === yudasTarget.id) {
+                        actions.lukasSelfHealUsed = true;
+                    }
+                }
+
+                // Protection 3: Maria Magdalena Urapan Kehidupan
+                if (actions.mariaHealActive && !actions.mariaHealUsed) {
+                    isSaved = true;
+                    actions.mariaHealUsed = true;
+                    addLog(`✨ Maria Magdalena menggunakan Urapan Kehidupan untuk menyelamatkan ${yudasTarget.name}!`);
+                }
+
+                if (isSaved) {
+                    savedPlayers.push(yudasTarget);
+                } else {
+                    casualties.push({ player: yudasTarget, cause: "Diserang Kelompok Yudas (Malam)" });
+                }
+            }
+
+            // Maria Magdalena Urapan Penghukuman (Racun)
+            if (actions.mariaPoisonTargetId && !actions.mariaPoisonUsed) {
+                const poisonTarget = gameState.players.find(p => p.id === actions.mariaPoisonTargetId && p.alive);
+                if (poisonTarget) {
+                    actions.mariaPoisonUsed = true;
+                    casualties.push({ player: poisonTarget, cause: "Urapan Penghukuman Maria Magdalena" });
+                    addLog(`🧪 Maria Magdalena mengoleskan Urapan Penghukuman kepada ${poisonTarget.name}.`);
+                }
+            }
+
+            // Save last protected for Malaikat
+            actions.lastMalaikatProtectedId = actions.malaikatProtectedId;
+
+            // Execute actual deaths
+            if (casualties.length > 0) {
+                casualties.forEach(c => {
+                    eliminatePlayer(c.player.id, c.cause);
+                });
+                const names = casualties.map(c => c.player.name).join(", ");
+                alert(`☀️ MUSYAWARAH SIANG ${gameState.roundCount}:\nKorban yang gugur di malam hari: ${names}`);
+            } else {
+                alert(`☀️ MUSYAWARAH SIANG ${gameState.roundCount}:\nPersekutuan tenang malam ini, tidak ada korban yang gugur!`);
+                addLog(`☀️ Tidak ada korban yang gugur pada Malam ${gameState.roundCount}.`);
+            }
+
+            // Reset night selection fields
+            actions.yudasTargetId = "";
+            actions.malaikatProtectedId = "";
+            actions.lukasHealedId = "";
+            actions.mariaHealActive = false;
+            actions.mariaPoisonTargetId = "";
+        }
+
+        // --- DASHBOARD LOGIC ENGINE ---
+        function renderDashboardUI() {
+            // Count Factions
+            const penyesatCount = gameState.players.filter(p => p.alive && ROLES_DATA[p.roleKey].faction === 'penyesat').length;
+            const jemaatCount = gameState.players.filter(p => p.alive && ROLES_DATA[p.roleKey].faction === 'jemaat').length;
+            const neutralCount = gameState.players.filter(p => p.alive && ROLES_DATA[p.roleKey].faction === 'netral').length;
+            const totalAlive = gameState.players.filter(p => p.alive).length;
+
+            document.getElementById('stat-penyesat-count').innerText = penyesatCount;
+            document.getElementById('stat-jemaat-count').innerText = jemaatCount;
+            document.getElementById('stat-neutral-count').innerText = neutralCount;
+            document.getElementById('stat-alive-total').innerText = totalAlive;
+
+            // Phase Theme Adjuster
+            const isNight = gameState.phase === 'night';
+            document.body.className = isNight 
+                ? "bg-parchment-900 text-parchment-200 min-h-screen font-sans flex flex-col night-mode transition-colors duration-1000"
+                : "bg-parchment-900 text-parchment-200 min-h-screen font-sans flex flex-col day-mode transition-colors duration-1000";
+
+            document.getElementById('phase-title-text').innerText = isNight ? "FASE MALAM SUNYI" : "FASE MUSYAWARAH SIANG";
+            document.getElementById('phase-round-counter').innerText = `${isNight ? 'Malam' : 'Siang'} ${gameState.roundCount}`;
+            document.getElementById('phase-subtitle-text').innerText = isNight 
+                ? "Seluruh jemaat pejamkan mata. Pemandu Game memanggil peran bertindak secara rahasia."
+                : "Waktu pengumuman, perdebatan jemaat, dan voting untuk mengadili 1 orang yang dicurigai!";
+
+            const toggleBtn = document.getElementById('btn-toggle-phase');
+            if (isNight) {
+                toggleBtn.innerHTML = `<i class="fa-solid fa-sun text-amber-400"></i> Proses & Ke Fase Siang`;
+                toggleBtn.className = "flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-indigo-800 to-purple-900 hover:from-indigo-700 hover:to-purple-800 text-white shadow-md border border-indigo-400/30 transition-all flex items-center justify-center gap-2";
+                document.getElementById('night-action-panel').classList.remove('hidden');
+                populateNightActionDropdowns();
+            } else {
+                toggleBtn.innerHTML = `<i class="fa-solid fa-moon text-indigo-300"></i> Masuk Fase Malam`;
+                toggleBtn.className = "flex-1 sm:flex-none px-5 py-2.5 rounded-xl font-bold text-sm bg-gradient-to-r from-amber-700 to-yellow-800 hover:from-amber-600 hover:to-yellow-700 text-white shadow-md border border-amber-400/30 transition-all flex items-center justify-center gap-2";
+                document.getElementById('night-action-panel').classList.add('hidden');
+            }
+
+            const iconBadge = document.getElementById('phase-badge-icon');
+            if (isNight) {
+                iconBadge.className = "w-14 h-14 rounded-2xl bg-indigo-950 border border-indigo-500/50 flex items-center justify-center text-indigo-300 text-2xl shadow-lg";
+                iconBadge.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            } else {
+                iconBadge.className = "w-14 h-14 rounded-2xl bg-amber-950 border border-amber-500/50 flex items-center justify-center text-amber-300 text-2xl shadow-lg glow-gold";
+                iconBadge.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            }
+
+            // Render Player Live Cards
+            const grid = document.getElementById('dashboard-players-grid');
+            grid.innerHTML = gameState.players.map(p => {
+                const r = ROLES_DATA[p.roleKey];
+                return `
+                    <div class="bg-parchment-900/80 p-3 rounded-xl border ${p.alive ? 'border-parchment-700' : 'border-red-950 opacity-60'} flex flex-col justify-between space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid ${r.icon} ${r.color} text-base"></i>
+                                <span class="font-bold text-sm ${p.alive ? 'text-white' : 'text-gray-500 line-through'}">${p.name}</span>
+                            </div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${p.alive ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-red-950 text-red-400 border border-red-900'}">
+                                ${p.alive ? 'HIDUP' : 'GUGUR'}
+                            </span>
+                        </div>
+
+                        <div class="text-[11px] text-parchment-400 flex items-center justify-between">
+                            <span>Tokoh: <strong class="${r.color}">${r.name}</strong></span>
+                            ${p.lovers ? '<span class="text-pink-400 font-bold"><i class="fa-solid fa-heart"></i> Sejiwa</span>' : ''}
+                        </div>
+
+                        ${p.alive ? `
+                            <div class="pt-2 border-t border-parchment-800 flex items-center gap-1.5">
+                                <button onclick="eliminatePlayer('${p.id}', 'Diserang Penyesat (Malam)')" class="flex-1 bg-red-950/80 hover:bg-red-900 text-red-200 text-[10px] font-semibold py-1 rounded border border-red-800/50 transition-all">
+                                    <i class="fa-solid fa-skull mr-1"></i> Diserang
+                                </button>
+                                <button onclick="eliminatePlayer('${p.id}', 'Eksekusi Voting Siang')" class="flex-1 bg-amber-950/80 hover:bg-amber-900 text-amber-200 text-[10px] font-semibold py-1 rounded border border-amber-800/50 transition-all">
+                                    <i class="fa-solid fa-gavel mr-1"></i> Dieksekusi
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="text-[10px] text-red-400/80 italic">Sebab: ${p.causeOfDeath || 'Gugur'}</div>
+                        `}
+                    </div>
+                `;
+            }).join('');
+
+            renderNightSequenceList();
+            checkWinCondition();
+        }
+
+        function renderNightSequenceList() {
+            const container = document.getElementById('night-call-sequence');
+            const activeRoleKeys = [...new Set(gameState.players.filter(p => p.alive).map(p => p.roleKey))];
+            
+            const nightOrderKeys = ['priskila_akwila', 'paulus', 'iblis', 'yudas', 'yulius', 'malaikat', 'lukas', 'maria', 'yohanes'];
+            const presentOrder = nightOrderKeys.filter(k => activeRoleKeys.includes(k));
+
+            if (presentOrder.length === 0) {
+                container.innerHTML = `<span class="text-parchment-500 italic">Tidak ada peran aktif bertindak malam ini.</span>`;
+                return;
+            }
+
+            container.innerHTML = presentOrder.map((key, idx) => {
+                const r = ROLES_DATA[key];
+                return `
+                    <div class="flex items-center justify-between bg-parchment-900/60 p-2 rounded border border-parchment-800">
+                        <span class="${r.color} font-medium"><span class="text-parchment-500 mr-1.5">${idx+1}.</span><i class="fa-solid ${r.icon} mr-1"></i> ${r.name}</span>
+                        <i class="fa-regular fa-circle-check text-parchment-600 cursor-pointer hover:text-emerald-400" onclick="this.classList.toggle('text-emerald-400'); this.classList.toggle('fa-solid');"></i>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleDayNightPhase() {
+            if (gameState.phase === 'night') {
+                processNightResolution();
+                gameState.phase = 'day';
+                addLog(`--- BERGANTI KE FASE MUSYAWARAH SIANG ${gameState.roundCount} ---`);
+                playSoundEffect('day');
+            } else {
+                gameState.phase = 'night';
+                gameState.roundCount++;
+                addLog(`--- BERGANTI KE FASE MALAM SUNYI ${gameState.roundCount} ---`);
+                playSoundEffect('night');
+            }
+            renderDashboardUI();
+        }
+
+        // --- ELIMINATIONS & SPECIAL TRIGGERS ---
+        function eliminatePlayer(playerId, cause) {
+            const player = gameState.players.find(p => p.id === playerId);
+            if (!player || !player.alive) return;
+
+            player.alive = false;
+            player.causeOfDeath = cause;
+            playSoundEffect('death');
+
+            addLog(`[GUGUR] ${player.name} (${ROLES_DATA[player.roleKey].name}) GUGUR (${cause}).`);
+
+            // Special Trigger 1: Saulus executed at Day Voting -> Independent Victory
+            if (player.roleKey === 'saulus' && cause === 'Eksekusi Voting Siang' && gameState.phase === 'day') {
+                triggerGameOver('saulus', player);
+                return;
+            }
+
+            // Special Trigger 2: Barabas executed at Day Voting -> Double kill next night
+            if (player.roleKey === 'barabas' && cause === 'Eksekusi Voting Siang') {
+                gameState.barabasTriggered = true;
+                alert("⚠️ DENDAM BARABAS AKTIF! Barabas dieksekusi Warga! Pada malam berikutnya kelompok Penyesat membalas dendam dengan menyingkirkan 2 ORANG SEKALIGUS!");
+                addLog("⚠️ DENDAM BARABAS AKTIF! Penyesat dapat 2x target serangan malam ini.");
+            }
+
+            // Special Trigger 3: Soulmates heartbreak
+            if (player.lovers) {
+                const otherLover = gameState.players.find(p => p.lovers && p.id !== player.id && p.alive);
+                if (otherLover) {
+                    setTimeout(() => {
+                        alert(`💔 PASANGAN SEJIWA (PRISKILA & AKWILA): ${otherLover.name} ikut gugur karena patah hati kehilangan pasangannya (${player.name})!`);
+                        eliminatePlayer(otherLover.id, 'Patah Hati (Pasangan Sejiwa)');
+                    }, 500);
+                }
+            }
+
+            // Special Trigger 4: Rasul Petrus retaliation
+            if (player.roleKey === 'petrus') {
+                setTimeout(() => {
+                    openPetrusTargetModal();
+                }, 600);
+            }
+
+            renderDashboardUI();
+        }
+
+        // Cupid / Priskila & Akwila Handlers
+        function openCupidModal() {
+            const select1 = document.getElementById('select-lover-1');
+            const select2 = document.getElementById('select-lover-2');
+
+            const optionsHTML = gameState.players.map(p => `<option value="${p.id}">${p.name} (${ROLES_DATA[p.roleKey].name})</option>`).join('');
+            select1.innerHTML = optionsHTML;
+            select2.innerHTML = optionsHTML;
+
+            if (gameState.players.length >= 2) select2.selectedIndex = 1;
+
+            document.getElementById('modal-cupid').classList.remove('hidden');
+        }
+
+        function closeCupidModal() {
+            document.getElementById('modal-cupid').classList.add('hidden');
+        }
+
+        function saveCupidLovers() {
+            const id1 = document.getElementById('select-lover-1').value;
+            const id2 = document.getElementById('select-lover-2').value;
+
+            if (id1 === id2) {
+                alert("Pasangan Sejiwa harus 2 orang yang berbeda!");
+                return;
+            }
+
+            gameState.players.forEach(p => p.lovers = false);
+            const p1 = gameState.players.find(p => p.id === id1);
+            const p2 = gameState.players.find(p => p.id === id2);
+
+            if (p1 && p2) {
+                p1.lovers = true;
+                p2.lovers = true;
+                addLog(`[PRISKILA & AKWILA] ${p1.name} dan ${p2.name} diikat sebagai Pasangan Sejiwa.`);
+                alert(`Berhasil mengikat ${p1.name} dan ${p2.name} sebagai Pasangan Sejiwa!`);
+            }
+
+            closeCupidModal();
+            renderDashboardUI();
+        }
+
+        // Petrus Modal Handlers
+        function openPetrusTargetModal() {
+            const targetSelect = document.getElementById('select-petrus-target');
+            const living = gameState.players.filter(p => p.alive);
+
+            if (living.length === 0) return;
+
+            targetSelect.innerHTML = living.map(p => `<option value="${p.id}">${p.name} (${ROLES_DATA[p.roleKey].name})</option>`).join('');
+            document.getElementById('modal-petrus').classList.remove('hidden');
+        }
+
+        function executePetrusShot() {
+            const targetId = document.getElementById('select-petrus-target').value;
+            document.getElementById('modal-petrus').classList.add('hidden');
+            if (targetId) {
+                eliminatePlayer(targetId, 'Bawaan Gugur Rasul Petrus');
+            }
+        }
+
+        // --- AUTOMATED WIN CONDITIONS ---
+        function checkWinCondition() {
+            if (gameState.isGameOver) return;
+
+            const penyesat = gameState.players.filter(p => p.alive && ROLES_DATA[p.roleKey].faction === 'penyesat');
+            const jemaat = gameState.players.filter(p => p.alive && ROLES_DATA[p.roleKey].faction === 'jemaat');
+
+            // 1. Jemaat Win: All Penyesat eliminated
+            if (penyesat.length === 0 && gameState.players.length > 0) {
+                triggerGameOver('jemaat');
+                return;
+            }
+
+            // 2. Penyesat Win: Penyesat >= Jemaat
+            if (penyesat.length >= jemaat.length && penyesat.length > 0) {
+                triggerGameOver('penyesat');
+                return;
+            }
+        }
+
+        function triggerGameOver(winner, specialPlayer = null) {
+            gameState.isGameOver = true;
+
+            const modal = document.getElementById('modal-victory');
+            const iconContainer = document.getElementById('victory-icon-container');
+            const icon = document.getElementById('victory-icon');
+            const title = document.getElementById('victory-title');
+            const subtitle = document.getElementById('victory-subtitle');
+
+            if (winner === 'jemaat') {
+                iconContainer.className = "w-20 h-20 rounded-full bg-blue-950 border-2 border-blue-400 flex items-center justify-center text-blue-400 text-4xl mx-auto glow-blue";
+                icon.className = "fa-solid fa-cross";
+                title.innerText = "FAKSI JEMAAT MENANG!";
+                title.className = "font-cinzel text-2xl sm:text-3xl font-extrabold text-blue-400 tracking-widest text-shadow-holy";
+                subtitle.innerText = "Kebenaran dan iman telah menang atas para penyesat!";
+                addLog(`🏆 GAME OVER: Faksi Jemaat Setia MENANG!`);
+            } else if (winner === 'penyesat') {
+                iconContainer.className = "w-20 h-20 rounded-full bg-red-950 border-2 border-red-500 flex items-center justify-center text-red-500 text-4xl mx-auto glow-crimson";
+                icon.className = "fa-solid fa-mask";
+                title.innerText = "FAKSI PENYESAT MENANG!";
+                title.className = "font-cinzel text-2xl sm:text-3xl font-extrabold text-red-500 tracking-widest text-shadow-holy";
+                subtitle.innerText = "Kelompok Yudas & Penyesat berhasil menguasai persekutuan!";
+                addLog(`🏆 GAME OVER: Faksi Penyesat MENANG!`);
+            } else if (winner === 'saulus') {
+                iconContainer.className = "w-20 h-20 rounded-full bg-amber-950 border-2 border-amber-400 flex items-center justify-center text-amber-400 text-4xl mx-auto glow-gold";
+                icon.className = "fa-solid fa-masks-theater";
+                title.innerText = "SAULUS MENANG SANGAT UNIK!";
+                title.className = "font-cinzel text-2xl sm:text-3xl font-extrabold text-amber-400 tracking-widest text-shadow-holy";
+                subtitle.innerText = `${specialPlayer ? specialPlayer.name : 'Saulus'} berhasil membuat dirinya diajak ke pengadilan dan dieksekusi jemaat!`;
+                addLog(`🏆 GAME OVER: ${specialPlayer ? specialPlayer.name : 'Saulus'} Menang Independen!`);
+            }
+
+            const recapList = document.getElementById('victory-recap-list');
+            recapList.innerHTML = gameState.players.map(p => {
+                const r = ROLES_DATA[p.roleKey];
+                return `
+                    <div class="flex items-center justify-between text-[11px] border-b border-parchment-800 pb-1">
+                        <span class="font-semibold text-white">${p.name}</span>
+                        <span class="${r.color}">${r.name} (${p.alive ? 'Hidup' : 'Gugur'})</span>
+                    </div>
+                `;
+            }).join('');
+
+            modal.classList.remove('hidden');
+        }
+
+        function restartGame() {
+            document.getElementById('modal-victory').classList.add('hidden');
+            gameState.players.forEach(p => {
+                p.roleKey = null;
+                p.alive = true;
+                p.causeOfDeath = null;
+                p.lovers = false;
+            });
+            gameState.isGameOver = false;
+            switchTab('setup');
+            updateSetupPlayerUI();
+        }
+
+        function addLog(message) {
+            gameState.logs.unshift(message);
+            const container = document.getElementById('game-logs-container');
+            container.innerHTML = gameState.logs.map(log => `
+                <div class="p-1.5 rounded bg-parchment-900/60 border border-parchment-800 font-mono text-[11px] leading-tight text-parchment-300">
+                    ${log}
+                </div>
+            `).join('');
+        }
+
+        // --- GUIDE TAB RENDERER ---
+        function renderGuideRoleCards() {
+            const grid = document.getElementById('role-cards-grid');
+            grid.innerHTML = Object.keys(ROLES_DATA).map(key => {
+                const r = ROLES_DATA[key];
+                return `
+                    <div class="parchment-card parchment-card-hover rounded-xl p-4 border-parchment-700 space-y-2 role-card-item" data-faction="${r.faction}" data-name="${r.name.toLowerCase()} ${r.origName.toLowerCase()}">
+                        <div class="flex items-center justify-between border-b border-parchment-700/60 pb-2">
+                            <span class="font-cinzel font-bold text-sm ${r.color} flex items-center gap-2">
+                                <i class="fa-solid ${r.icon}"></i> ${r.name}
+                            </span>
+                            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-parchment-900 border border-parchment-700 text-parchment-400">
+                                ${r.faction}
+                            </span>
+                        </div>
+                        <div class="text-[10px] text-holy-gold font-mono">Kembaran Role Werewolf: ${r.origName}</div>
+                        <p class="text-xs text-parchment-300 leading-relaxed">${r.desc}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterRoleCards(faction) {
+            document.querySelectorAll('.role-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-holy-gold', 'text-parchment-900');
+                btn.classList.add('bg-parchment-800', 'text-parchment-300');
+            });
+
+            event.target.classList.remove('bg-parchment-800', 'text-parchment-300');
+            event.target.classList.add('bg-holy-gold', 'text-parchment-900');
+
+            const cards = document.querySelectorAll('.role-card-item');
+            cards.forEach(card => {
+                if (faction === 'all' || card.dataset.faction === faction) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        function searchRoleCards() {
+            const query = document.getElementById('search-role-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.role-card-item');
+            cards.forEach(card => {
+                if (card.dataset.name.includes(query)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
