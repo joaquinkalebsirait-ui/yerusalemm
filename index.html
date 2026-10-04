@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Persekutuan & Penyesat - Web Assistant & Game Master</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=MedievalSharp&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0806;
+      --bg-card: #14100c;
+      --bg-card-hover: #1c1712;
+      --border-gold: #c5a059;
+      --border-gold-dark: #8c6d32;
+      --text-gold: #f3e5ab;
+      --text-main: #e2d9cc;
+      --text-muted: #9e9182;
+      --red-accent: #901a1e;
+      --red-hover: #b32429;
+      --gold-bright: #ffd700;
+      --parchment: #f4e8c1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(144, 26, 30, 0.15), transparent 70%),
+        radial-gradient(circle at 50% 100%, rgba(197, 160, 89, 0.1), transparent 70%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header & Navigation */
+    header {
+      background: linear-gradient(180deg, #18120c 0%, #0a0806 100%);
+      border-bottom: 2px solid var(--border-gold-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      font-size: 2rem;
+      color: var(--border-gold);
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-gold);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.4);
+      padding: 0.25rem;
+      border-radius: 8px;
+      border: 1px solid rgba(197, 160, 89, 0.2);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.6rem 1.2rem;
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-gold);
+      background: rgba(197, 160, 89, 0.1);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--border-gold-dark), var(--border-gold));
+      color: #000;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(197, 160, 89, 0.4);
+    }
+
+    .mode-toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.6);
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      border: 1px solid var(--border-gold-dark);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #333;
+      transition: .4s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text-gold);
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--red-accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Common Card & Form Elements */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold-dark);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      color: var(--text-gold);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+      padding-bottom: 0.5rem;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--border-gold-dark), var(--border-gold));
+      color: #000;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(197, 160, 89, 0.4);
+    }
+
+    .btn-red {
+      background: linear-gradient(135deg, var(--red-accent), #c0392b);
+      color: #fff;
+    }
+
+    .btn-red:hover {
+      box-shadow: 0 4px 15px rgba(144, 26, 30, 0.5);
+    }
+
+    .btn-secondary {
+      background: #2a2219;
+      color: var(--text-main);
+      border: 1px solid var(--border-gold-dark);
+    }
+
+    .btn-secondary:hover {
+      background: #3a2f23;
+    }
+
+    input[type="text"], textarea, select {
+      background: #0d0a08;
+      border: 1px solid var(--border-gold-dark);
+      color: var(--text-main);
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-family: inherit;
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"]:focus, select:focus {
+      outline: none;
+      border-color: var(--border-gold);
+      box-shadow: 0 0 8px rgba(197, 160, 89, 0.3);
+    }
+
+    /* Tab Setup */
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .setup-grid { grid-template-columns: 1fr; }
+    }
+
+    .player-input-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 350px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .player-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .player-input-row input {
+      margin-bottom: 0;
+    }
+
+    /* Card Secret Reveal */
+    .secret-inspection-card {
+      text-align: center;
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 2.5rem;
+      border: 2px solid var(--border-gold);
+      background: radial-gradient(circle, #1f1810 0%, #0a0806 100%);
+    }
+
+    .role-card-inner {
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #0d0a08;
+      border: 1px dashed var(--border-gold-dark);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    /* Gameplay Board */
+    .game-status-header {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .status-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold-dark);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .status-val {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-gold);
+    }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .game-layout { grid-template-columns: 1fr; }
+    }
+
+    /* Players Table */
+    .player-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .player-table th, .player-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(197, 160, 89, 0.1);
+    }
+
+    .player-table th {
+      font-family: 'Cinzel', serif;
+      color: var(--text-gold);
+      background: rgba(0,0,0,0.4);
+    }
+
+    .player-row.dead {
+      opacity: 0.4;
+      background: rgba(144, 26, 30, 0.1);
+    }
+
+    .player-row.dead .player-name {
+      text-decoration: line-through;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-jemaat { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+    .badge-yudas { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+    .badge-netral { background: rgba(241, 196, 15, 0.2); color: #f1c40f; border: 1px solid #f1c40f; }
+
+    /* Action Panels */
+    .action-panel {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-gold-dark);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .action-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: var(--text-gold);
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Logs */
+    .log-container {
+      background: #080604;
+      border: 1px solid var(--border-gold-dark);
+      border-radius: 8px;
+      padding: 1rem;
+      height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+
+    .log-item {
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .log-time { color: var(--border-gold); }
+
+    /* Rules Tab */
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .role-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-gold-dark);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .role-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .role-name {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      color: var(--text-gold);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 2px solid var(--border-gold);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(197, 160, 89, 0.3);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: var(--text-gold);
+      margin-bottom: 1rem;
+    }
+
+    .voting-select-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .vote-item {
+      background: #0d0a08;
+      border: 1px solid var(--border-gold-dark);
+      padding: 0.5rem;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="brand-icon">📜</span>
+      <div class="brand-title">Persekutuan & Penyesat</div>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('setupTab')">1. Persiapan</button>
+      <button class="tab-btn" id="navInspectTab" onclick="switchTab('inspectTab')" disabled>2. Intip Peran</button>
+      <button class="tab-btn" id="navGameTab" onclick="switchTab('gameTab')" disabled>3. Permainan</button>
+      <button class="tab-btn" onclick="switchTab('rulesTab')">Buku Panduan</button>
+    </div>
+    <div class="mode-toggle-container">
+      <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-gold);" id="modeLabel">Layar Moderator</span>
+      <label class="switch">
+        <input type="checkbox" id="publicModeToggle" onchange="togglePublicMode()">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: SETUP -->
+    <div id="setupTab" class="tab-content active">
+      <div class="setup-grid">
+        <div class="card">
+          <div class="card-title">👥 Daftar Pemain (Minimal 8 Pemain)</div>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Masukkan nama semua orang yang ikut bermain. Jika pemain lebih dari 15, peran standar (Jemaat Mula-mula & Yudas) akan otomatis ditambah secara acak.</p>
+          <div class="player-input-list" id="playerInputs">
+            <!-- Dynamic Inputs -->
+          </div>
+          <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary" onclick="addPlayerInput()">+ Tambah Pemain</button>
+            <button class="btn" onclick="generateDefaultPlayers()">Isi Contoh (10 Pemain)</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">⚙️ Konfigurasi Peran</div>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Status jumlah pemain dan kesesuaian dek peran.</p>
+          <div style="background: #0d0a08; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-gold-dark);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+              <span>Total Pemain Diinput:</span>
+              <strong id="totalPlayerCount" style="color: var(--text-gold);">0</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>Status Dek Peran:</span>
+              <strong id="deckStatusText" style="color: #2ecc71;">Siap Acak</strong>
+            </div>
+          </div>
+          <button class="btn btn-red" style="width: 100%; justify-content: center; font-size: 1.1rem;" onclick="startRoleAssignment()">🎲 ACAK PERAN & MULAI</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: INSPECT ROLES (SECRET SHOW/HIDE) -->
+    <div id="inspectTab" class="tab-content">
+      <div class="card secret-inspection-card">
+        <div class="card-title" style="justify-content: center;">🔒 Intip Peran Rahasia</div>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Panggil pemain sesuai nama di bawah untuk melihat kartunya secara pribadi.</p>
+        
+        <div style="margin-top: 1.5rem; font-size: 1.4rem; font-family: 'Cinzel', serif; color: var(--text-gold);" id="inspectPlayerName">
+          Pemain: -
+        </div>
+
+        <div class="role-card-inner" id="secretRoleBox">
+          <span style="color: var(--text-muted); font-style: italic;">Klik tombol di bawah untuk membuka kartu peran rahasia Anda.</span>
+        </div>
+
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+          <button class="btn btn-secondary" id="btnToggleRole" onclick="toggleSecretRoleVisibility()">👁️ Buka Peran</button>
+          <button class="btn" id="btnNextInspect" onclick="nextInspectPlayer()" disabled>Pemain Berikutnya ➔</button>
+        </div>
+
+        <div style="margin-top: 2rem; border-top: 1px solid rgba(197,160,89,0.2); padding-top: 1rem;">
+          <button class="btn btn-red" onclick="finishRoleInspection()">✅ Semua Sudah Intip - Ke Fase Malam 1</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: MAIN GAMEPLAY DASHBOARD -->
+    <div id="gameTab" class="tab-content">
+      <div class="game-status-header">
+        <div class="status-box">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">FASE PERMAINAN</div>
+          <div class="status-val" id="displayPhase">Malam 1</div>
+        </div>
+        <div class="status-box">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">JEMAAT HIDUP</div>
+          <div class="status-val" style="color: #2ecc71;" id="displayJemaatCount">0</div>
+        </div>
+        <div class="status-box">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">PENYESAT HIDUP</div>
+          <div class="status-val" style="color: #e74c3c;" id="displayYudasCount">0</div>
+        </div>
+        <div class="status-box">
+          <div style="font-size: 0.8rem; color: var(--text-muted);">FAKSI NETRAL</div>
+          <div class="status-val" style="color: #f1c40f;" id="displayNetralCount">0</div>
+        </div>
+      </div>
+
+      <div class="game-layout">
+        <!-- Left Column: Players & Active Control Panel -->
+        <div>
+          <!-- Players List Card -->
+          <div class="card">
+            <div class="card-title">
+              <span>👥 Daftar Pemain & Status</span>
+              <button class="btn btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" id="btnTriggerVoting" onclick="openVotingModal()">⚖️ Sesi Voting Siang</button>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="player-table">
+                <thead>
+                  <tr>
+                    <th>Nama Pemain</th>
+                    <th class="mod-only-col">Peran / Faksi</th>
+                    <th>Status</th>
+                    <th>Aksi Manual</th>
+                  </tr>
+                </thead>
+                <tbody id="playerTableBody">
+                  <!-- Dynamic Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Night Actions Panel (Appears during Night Phase) -->
+          <div class="card" id="nightActionsCard">
+            <div class="card-title">🌙 Sesi Aksi Malam (Perekaman Otomatis)</div>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Semua tindakan malam hari dicatat di sini. Moderator/Pemain memilih target sesuai instruksi.</p>
+
+            <div id="nightActionsContainer">
+              <!-- Dynamic Role Action Boxes -->
+            </div>
+
+            <button class="btn btn-red" style="width: 100%; justify-content: center; margin-top: 1rem;" onclick="processNightPhase()">🌅 Proses Aksi Malam & Ke Fase Siang</button>
+          </div>
+
+          <!-- Day Transition Panel -->
+          <div class="card" id="dayActionsCard" style="display: none;">
+            <div class="card-title">☀️ Fase Siang - Musyawarah Jemaat</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">Lakukan diskusi selama 3-5 menit. Gunakan tombol "Sesi Voting Siang" di atas untuk menentukan siapa yang dieksekusi.</p>
+            <button class="btn" style="width: 100%; justify-content: center;" onclick="transitionToNight()">🌙 Lanjut Ke Fase Malam Berikutnya</button>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Logs -->
+        <div>
+          <div class="card">
+            <div class="card-title">📜 Catatan Alur Permainan</div>
+            <div class="log-container" id="gameLogBox">
+              <div class="log-item"><span class="log-time">[System]</span> Permainan dipersiapkan...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: RULES DIRECTORY -->
+    <div id="rulesTab" class="tab-content">
+      <div class="card">
+        <div class="card-title">📖 Panduan Cara Bermain & Direktori 15 Tokoh Alkitab</div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Penjelasan alur permainan serta daftar lengkap 15 peran berdasarkan faksi masing-masing.</p>
+        
+        <h3 style="font-family: 'Cinzel', serif; color: var(--text-gold); margin-bottom: 1rem;">15 Tokoh & Tugasnya</h3>
+        <div class="role-grid" id="rulesRoleGrid">
+          <!-- Dynamic Role Directory Cards -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL VOTING SIANG -->
+  <div class="modal-overlay" id="votingModal">
+    <div class="modal-content">
+      <div class="modal-title">⚖️ Pengadilan Siang</div>
+      <p style="color: var(--text-muted); font-size: 0.85rem;">Pilih pemain yang mendapatkan voting terbanyak dari warga untuk dieksekusi.</p>
+      
+      <div style="margin: 1rem 0; text-align: left;">
+        <label style="font-size: 0.85rem; color: var(--text-gold);">Target Eksekusi Siang:</label>
+        <select id="voteTargetSelect"></select>
+      </div>
+
+      <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">*Catatan: Bobot suara Rasul Yakobus otomatis dihitung bernilai 2 suara jika ia masih hidup.</p>
+
+      <div style="display: flex; gap: 0.5rem; justify-content: center;">
+        <button class="btn btn-red" onclick="executeVotingTarget()">Eksekusi Pemain</button>
+        <button class="btn btn-secondary" onclick="closeVotingModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ANNOUNCEMENT / ANIMATION -->
+  <div class="modal-overlay" id="announcementModal">
+    <div class="modal-content">
+      <div class="modal-title" id="announceTitle">Pengumuman</div>
+      <p id="announceBody" style="font-size: 1.1rem; margin: 1.5rem 0; color: var(--text-gold);"></p>
+      <button class="btn" onclick="closeAnnouncementModal()">Lanjutkan</button>
+    </div>
+  </div>
+
+  <script>
+    /* GAME DATABASE & DATA STRUCTURES */
+    const ROLE_DATABASE = [
+      // Faksi Penyesat (4)
+      { id: 'yudas', name: 'Yudas Iskariot', faction: 'penyesat', orig: 'Werewolf', desc: 'Bangun setiap malam bersama pengikut Yudas untuk menyepakati 1 korban yang dieliminasi.' },
+      { id: 'yulius', name: 'Yulius sang Perwira', faction: 'penyesat', orig: 'Alpha Werewolf', desc: 'Memiliki kemampuan 1 kali dalam permainan untuk mengubah korban malam menjadi penyesat baru.' },
+      { id: 'barabas', name: 'Barabas', faction: 'penyesat', orig: 'Wolf Cub', desc: 'Jika dieksekusi di siang hari, malam berikutnya faksi penyesat membalas dendam dengan memangsa 2 korban sekaligus.' },
+      { id: 'iblis', name: 'Iblis / Penguji', faction: 'penyesat', orig: 'Sorceress', desc: 'Bangun di malam hari untuk mengintip peran pemain dengan tujuan khusus mencari Rasul Paulus.' },
+      
+      // Faksi Jemaat (8)
+      { id: 'jemaat', name: 'Jemaat Mula-mula', faction: 'jemaat', orig: 'Villager', desc: 'Warga biasa tanpa kemampuan malam. Bertugas aktif berdiskusi dan ber-vote di siang hari.' },
+      { id: 'paulus', name: 'Rasul Paulus', faction: 'jemaat', orig: 'Seer', desc: 'Bangun setiap malam untuk mengintip faksi 1 pemain (Jemaat/Netral vs Penyesat).' },
+      { id: 'malaikat', name: 'Malaikat Pelindung', faction: 'jemaat', orig: 'Bodyguard', desc: 'Bangun setiap malam melindungi 1 pemain dari serangan penyesat. Tidak bisa memilih orang yang sama 2 malam berturut-turut.' },
+      { id: 'lukas', name: 'Lukas sang Tabib', faction: 'jemaat', orig: 'Doctor', desc: 'Bangun di malam hari untuk menyembuhkan 1 korban. Boleh menyembuhkan diri sendiri maksimal 1 kali.' },
+      { id: 'petrus', name: 'Rasul Petrus', faction: 'jemaat', orig: 'Hunter', desc: 'Jika tewas (malam/siang), ia berhak langsung menembak dan membawa 1 pemain lain untuk ikut gugur.' },
+      { id: 'maria', name: 'Maria Magdalena', faction: 'jemaat', orig: 'Witch', desc: 'Memiliki 1 Urapan Kehidupan (sembuhkan korban) dan 1 Urapan Penghukuman (bunuh 1 pemain).' },
+      { id: 'yohanes', name: 'Rasul Yohanes', faction: 'jemaat', orig: 'Medium', desc: 'Bangun di malam hari untuk mengetahui peran TEPAT dari pemain yang baru saja dieksekusi siang sebelumnya.' },
+      { id: 'yakobus', name: 'Rasul Yakobus', faction: 'jemaat', orig: 'Mayor', desc: 'Saat voting siang hari, bobot suaranya bernilai 2 suara.' },
+
+      // Faksi Netral (3)
+      { id: 'saulus', name: 'Saulus', faction: 'netral', orig: 'Fool / Tanner', desc: 'Menang sendiri jika berhasil membuat dirinya sendiri dieksekusi/ter-vote oleh warga di siang hari.' },
+      { id: 'cupid', name: 'Priskila & Akwila', faction: 'netral', orig: 'Cupid', desc: 'Malam pertama memilih 2 pemain sebagai Pasangan Sejiwa. Jika salah satu tewas, pasangannya ikut gugur.' },
+      { id: 'tomas', name: 'Tomas', faction: 'netral', orig: 'Lycan', desc: 'Jemaat setia, namun jika diintip oleh Rasul Paulus, penglihatan Paulus akan menampilkan Tomas sebagai Penyesat.' }
+    ];
+
+    let gameState = {
+      players: [], // { id, name, role, isAlive, loverId }
+      currentPhaseNumber: 1,
+      isNight: true,
+      publicMode: false,
+      inspectIndex: 0,
+      inspectRoleRevealed: false,
+      
+      // Special Abilities Tracker
+      usedYuliusConvert: false,
+      barabasRevengeActive: false,
+      lukasSelfHealed: false,
+      mariaHealUsed: false,
+      mariaPoisonUsed: false,
+      lastProtectedId: null,
+      lastExecutedPlayer: null,
+      lovers: []
+    };
+
+    /* INITIALIZATION & SETUP */
+    window.onload = function() {
+      generateDefaultInputs(10);
+      renderRulesDirectory();
+    };
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function togglePublicMode() {
+      gameState.publicMode = document.getElementById('publicModeToggle').checked;
+      document.getElementById('modeLabel').innerText = gameState.publicMode ? "Layar Publik (Role Tersembunyi)" : "Layar Moderator";
+      
+      // Toggle table columns visibility
+      const modCols = document.querySelectorAll('.mod-only-col');
+      modCols.forEach(col => col.style.display = gameState.publicMode ? 'none' : '');
+      
+      renderPlayerTable();
+    }
+
+    function generateDefaultInputs(count) {
+      const container = document.getElementById('playerInputs');
+      container.innerHTML = '';
+      for (let i = 1; i <= count; i++) {
+        const row = document.createElement('div');
+        row.className = 'player-input-row';
+        row.innerHTML = `
+          <input type="text" class="player-name-input" placeholder="Nama Pemain ${i}" value="Pemain ${i}">
+          <button class="btn btn-red" style="padding: 0.2rem 0.6rem;" onclick="this.parentElement.remove(); updatePlayerCount();">✕</button>
+        `;
+        container.appendChild(row);
+      }
+      updatePlayerCount();
+    }
+
+    function generateDefaultPlayers() {
+      generateDefaultInputs(10);
+    }
+
+    function addPlayerInput() {
+      const container = document.getElementById('playerInputs');
+      const count = container.children.length + 1;
+      const row = document.createElement('div');
+      row.className = 'player-input-row';
+      row.innerHTML = `
+        <input type="text" class="player-name-input" placeholder="Nama Pemain ${count}">
+        <button class="btn btn-red" style="padding: 0.2rem 0.6rem;" onclick="this.parentElement.remove(); updatePlayerCount();">✕</button>
+      `;
+      container.appendChild(row);
+      updatePlayerCount();
+    }
+
+    function updatePlayerCount() {
+      const inputs = document.querySelectorAll('.player-name-input');
+      const count = inputs.length;
+      document.getElementById('totalPlayerCount').innerText = count;
+      
+      const statusText = document.getElementById('deckStatusText');
+      if (count < 8) {
+        statusText.innerText = "Minimal 8 Pemain!";
+        statusText.style.color = "#e74c3c";
+      } else {
+        statusText.innerText = `Siap (${count} Pemain)`;
+        statusText.style.color = "#2ecc71";
+      }
+    }
+
+    /* ROLE ASSIGNMENT & SHUFFLE */
+    function startRoleAssignment() {
+      const inputs = document.querySelectorAll('.player-name-input');
+      const names = Array.from(inputs).map(inp => inp.value.trim()).filter(val => val !== "");
+
+      if (names.length < 8) {
+        alert("Jumlah pemain minimal 8 orang!");
+        return;
+      }
+
+      // Build Deck
+      let roleDeck = [...ROLE_DATABASE];
+      
+      // If player count exceeds default 15 roles, duplicate 'jemaat' or 'yudas'
+      while (roleDeck.length < names.length) {
+        if (roleDeck.length % 3 === 0) {
+          roleDeck.push({...ROLE_DATABASE.find(r => r.id === 'yudas')});
+        } else {
+          roleDeck.push({...ROLE_DATABASE.find(r => r.id === 'jemaat')});
+        }
+      }
+
+      // If player count is less than 15, trim optional roles safely
+      if (names.length < 15) {
+        roleDeck = roleDeck.slice(0, names.length);
+      }
+
+      // Shuffle Deck
+      for (let i = roleDeck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [roleDeck[i], roleDeck[j]] = [roleDeck[j], roleDeck[i]];
+      }
+
+      // Assign to Players
+      gameState.players = names.map((name, index) => ({
+        id: index + 1,
+        name: name,
+        role: roleDeck[index],
+        isAlive: true,
+        loverId: null
+      }));
+
+      // Enable Tabs
+      document.getElementById('navInspectTab').disabled = false;
+      document.getElementById('navGameTab').disabled = false;
+
+      // Start Inspection Phase
+      gameState.inspectIndex = 0;
+      setupInspectCard();
+      switchTab('inspectTab');
+      logEvent(`Peran telah diacak untuk ${names.length} pemain.`);
+    }
+
+    /* SECRET INSPECTION PHASE */
+    function setupInspectCard() {
+      const player = gameState.players[gameState.inspectIndex];
+      document.getElementById('inspectPlayerName').innerText = `Pemain ${gameState.inspectIndex + 1}: ${player.name}`;
+      
+      const box = document.getElementById('secretRoleBox');
+      box.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Klik tombol di bawah untuk membuka kartu peran rahasia Anda.</span>`;
+      
+      gameState.inspectRoleRevealed = false;
+      document.getElementById('btnToggleRole').innerText = "👁️ Buka Peran";
+      document.getElementById('btnNextInspect').disabled = true;
+    }
+
+    function toggleSecretRoleVisibility() {
+      const box = document.getElementById('secretRoleBox');
+      const player = gameState.players[gameState.inspectIndex];
+
+      if (!gameState.inspectRoleRevealed) {
+        box.innerHTML = `
+          <div style="font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--text-gold); font-weight:700;">${player.role.name}</div>
+          <div class="badge badge-${player.role.faction}" style="margin: 0.5rem 0;">Faksi: ${player.role.faction.toUpperCase()}</div>
+          <p style="font-size: 0.85rem; color: var(--text-main); margin-top: 0.5rem;">${player.role.desc}</p>
+        `;
+        gameState.inspectRoleRevealed = true;
+        document.getElementById('btnToggleRole').innerText = "🙈 Sembunyikan Peran";
+        document.getElementById('btnNextInspect').disabled = false;
+      } else {
+        box.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">Kartu tersembunyi. Silakan serahkan perangkat ke moderator atau pemain berikutnya.</span>`;
+        gameState.inspectRoleRevealed = false;
+        document.getElementById('btnToggleRole').innerText = "👁️ Buka Peran";
+      }
+    }
+
+    function nextInspectPlayer() {
+      if (gameState.inspectIndex < gameState.players.length - 1) {
+        gameState.inspectIndex++;
+        setupInspectCard();
+      } else {
+        alert("Semua pemain telah selesai mengintip perannya!");
+      }
+    }
+
+    function finishRoleInspection() {
+      switchTab('gameTab');
+      renderGameplayDashboard();
+      logEvent("Fase Malam Pertama Dimulai.");
+    }
+
+    /* GAMEPLAY DASHBOARD & RENDERING */
+    function renderGameplayDashboard() {
+      updateCounters();
+      renderPlayerTable();
+      renderNightActions();
+    }
+
+    function updateCounters() {
+      const alive = gameState.players.filter(p => p.isAlive);
+      const jemaatCount = alive.filter(p => p.role.faction === 'jemaat').length;
+      const yudasCount = alive.filter(p => p.role.faction === 'penyesat').length;
+      const netralCount = alive.filter(p => p.role.faction === 'netral').length;
+
+      document.getElementById('displayJemaatCount').innerText = jemaatCount;
+      document.getElementById('displayYudasCount').innerText = yudasCount;
+      document.getElementById('displayNetralCount').innerText = netralCount;
+      document.getElementById('displayPhase').innerText = `${gameState.isNight ? 'Malam' : 'Siang'} ${gameState.currentPhaseNumber}`;
+
+      checkWinConditions(jemaatCount, yudasCount, netralCount);
+    }
+
+    function renderPlayerTable() {
+      const tbody = document.getElementById('playerTableBody');
+      tbody.innerHTML = '';
+
+      gameState.players.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.className = `player-row ${p.isAlive ? '' : 'dead'}`;
+
+        let roleCell = '';
+        if (!gameState.publicMode) {
+          roleCell = `
+            <td class="mod-only-col">
+              <strong>${p.role.name}</strong><br>
+              <span class="badge badge-${p.role.faction}">${p.role.faction}</span>
+            </td>
+          `;
+        }
+
+        tr.innerHTML = `
+          <td>
+            <span class="player-name" style="font-weight: 600;">${p.name}</span>
+            ${p.loverId ? ' 💕' : ''}
+          </td>
+          ${roleCell}
+          <td>${p.isAlive ? '🟢 Hidup' : '🔴 Gugur'}</td>
+          <td>
+            ${p.isAlive ? `<button class="btn btn-red" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="manualEliminate(${p.id})">Gugurkan</button>` : '<span style="color:var(--text-muted); font-size:0.8rem;">-</span>'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* NIGHT ACTIONS GENERATOR & RESOLUTION */
+    function renderNightActions() {
+      const container = document.getElementById('nightActionsContainer');
+      container.innerHTML = '';
+
+      if (!gameState.isNight) return;
+
+      const alivePlayers = gameState.players.filter(p => p.isAlive);
+
+      // 1. Priskila & Akwila (Cupid) - Malam 1 Saja
+      if (gameState.currentPhaseNumber === 1) {
+        const cupidAction = document.createElement('div');
+        cupidAction.className = 'action-panel';
+        cupidAction.innerHTML = `
+          <div class="action-title">🕊️ Priskila & Akwila (Jodohkan Pasangan)</div>
+          <div style="display: flex; gap: 0.5rem;">
+            <select id="cupidTarget1">${getPlayerOptions()}</select>
+            <select id="cupidTarget2">${getPlayerOptions()}</select>
+          </div>
+        `;
+        container.appendChild(cupidAction);
+      }
+
+      // 2. Rasul Paulus (Seer)
+      const paulus = gameState.players.find(p => p.role.id === 'paulus' && p.isAlive);
+      if (paulus) {
+        const div = document.createElement('div');
+        div.className = 'action-panel';
+        div.innerHTML = `
+          <div class="action-title">👁️ Rasul Paulus (Karunia Marifat / Seer)</div>
+          <select id="paulusTarget" onchange="inspectPaulusTarget(this.value)">
+            <option value="">-- Pilih Player Untuk Diintip --</option>
+            ${getPlayerOptions()}
+          </select>
+          <div id="paulusResult" style="margin-top:0.5rem; font-weight:bold; color:var(--text-gold);"></div>
+        `;
+        container.appendChild(div);
+      }
+
+      // 3. Iblis / Penguji (Sorceress)
+      const iblis = gameState.players.find(p => p.role.id === 'iblis' && p.isAlive);
+      if (iblis) {
+        const div = document.createElement('div');
+        div.className = 'action-panel';
+        div.innerHTML = `
+          <div class="action-title">🐍 Iblis / Penguji (Cari Rasul Paulus)</div>
+          <select id="iblisTarget" onchange="inspectIblisTarget(this.value)">
+            <option value="">-- Pilih Player Untuk Diintip --</option>
+            ${getPlayerOptions()}
+          </select>
+          <div id="iblisResult" style="margin-top:0.5rem; font-weight:bold; color:var(--text-gold);"></div>
+        `;
+        container.appendChild(div);
+      }
+
+      // 4. Rasul Yohanes (Medium)
+      const yohanes = gameState.players.find(p => p.role.id === 'yohanes' && p.isAlive);
+      if (yohanes && gameState.lastExecutedPlayer) {
+        const div = document.createElement('div');
+        div.className = 'action-panel';
+        div.innerHTML = `
+          <div class="action-title">📖 Rasul Yohanes (Intip Peran Pemain Mati Siang)</div>
+          <p style="font-size:0.85rem;">Mengecek peran dari: <strong>${gameState.lastExecutedPlayer.name}</strong></p>
+          <button class="btn btn-secondary" style="margin-top:0.5rem; font-size:0.8rem;" onclick="revealYohanesMedium()">Lihat Peran Sebenarnya</button>
+          <div id="yohanesResult" style="margin-top:0.5rem; font-weight:bold; color:var(--text-gold);"></div>
+        `;
+        container.appendChild(div);
+      }
+
+      // 5. Faksi Yudas (Night Kill)
+      const yudasKillers = gameState.players.filter(p => (p.role.id === 'yudas' || p.role.id === 'yulius' || p.role.id === 'barabas' || p.role.id === 'iblis') && p.isAlive && p.role.faction === 'penyesat');
+      if (yudasKillers.length > 0) {
+        const div = document.createElement('div');
+        div.className = 'action-panel';
+        div.innerHTML = `
+          <div class="action-title">🗡️ Kelompok Yudas (Target Mangsa Utama)</div>
+          <select id="yudasTarget1">${getPlayerOptions()}</select>
+          ${gameState.barabasRevengeActive ? `
+            <div style="margin-top:0.5rem;">
+              <label style="color:#e74c3c; font-size:0.85rem;">🔥 Balas Dendam Barabas (Target Mangsa Ke-2):</label>
+              <select id="yudasTarget2">${getPlayerOptions()}</select>
+            </div>
+          ` : ''}
+          ${(!gameState.usedYuliusConvert && gameState.players.some(p => p.role.id === 'yulius' && p.isAlive)) ? `
+            <div style="margin-top:0.5rem;">
+              <label style="font-size:0.85rem;"><input type="checkbox" id="yuliusConvertCheck"> Gunakan Karunia Yulius (Ubah Korban Jadi Penyesat, Bukan Dibunuh)</label>
+            </div>
+          ` : ''}
+        `;
+        container.appendChild(div);
+      }
+
+      // 6. Malaikat Pelindung (Defender)
+      const malaikat = gameState.players.find(p => p.role.id === 'malaikat' && p.isAlive);
+      if (malaikat) {
+        const div = document.createElement('div');
+        div.className = 'action-panel';
+        div.innerHTML = `
+          <div class="action-title">🛡️ Malaikat Pelindung (Proteksi)</div>
+          <select id="malaikatTarget">${getPlayerOptions(gameState.lastProtectedId)}</select>
+        `;
+        container.appendChild(div);
+      }
+
+      // 7. Lukas sang Tabib (Doctor)
+      const lukas = gameState.players.find(p => p.role.id === 'lukas' && p.isAlive);
+      if (lukas) {
+        const div = document.createElement('div');
+        div.className = 'action-panel';
+        div.innerHTML = `
+          <div class="action-title">🩺 Lukas sang Tabib (Pemulihan)</div>
+          <select id="lukasTarget">${getPlayerOptions()}</select>
+        `;
+        container.appendChild(div);
+      }
+
+      // 8. Maria Magdalena (Witch)
+      const maria = gameState.players.find(p => p.role.id === 'maria' && p.isAlive);
+      if (maria) {
+        const div = document.createElement('div');
+        div.className = 'action-panel';
+        div.innerHTML = `
+          <div class="action-title">🧪 Maria Magdalena (Urapan Kehidupan & Penghukuman)</div>
+          ${!gameState.mariaHealUsed ? `<label style="font-size:0.85rem; display:block; margin-bottom:0.5rem;"><input type="checkbox" id="mariaHealCheck"> Gunakan Urapan Kehidupan (Selamatkan Korban Yudas)</label>` : ''}
+          ${!gameState.mariaPoisonUsed ? `
+            <label style="font-size:0.85rem;">Target Urapan Penghukuman (Racun):</label>
+            <select id="mariaPoisonTarget"><option value="">-- Tidak Gunakan Racun --</option>${getPlayerOptions()}</select>
+          ` : ''}
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    function getPlayerOptions(excludeId = null) {
+      return gameState.players
+        .filter(p => p.isAlive && p.id !== excludeId)
+        .map(p => `<option value="${p.id}">${p.name}</option>`)
+        .join('');
+    }
+
+    function inspectPaulusTarget(targetId) {
+      if (!targetId) return;
+      const target = gameState.players.find(p => p.id == targetId);
+      const isTomas = target.role.id === 'tomas';
+      const isPenyesat = target.role.faction === 'penyesat' || isTomas;
+      
+      document.getElementById('paulusResult').innerText = `Hasil Penglihatan Paulus: ${target.name} adalah [${isPenyesat ? 'PENYESAT / YUDAS' : 'JEMAAT SETIA'}]`;
+    }
+
+    function inspectIblisTarget(targetId) {
+      if (!targetId) return;
+      const target = gameState.players.find(p => p.id == targetId);
+      const isPaulus = target.role.id === 'paulus';
+      
+      document.getElementById('iblisResult').innerText = `Hasil Penguji: ${target.name} ${isPaulus ? 'adalah RASUL PAULUS!' : 'BUKAN Rasul Paulus.'}`;
+    }
+
+    function revealYohanesMedium() {
+      if (gameState.lastExecutedPlayer) {
+        document.getElementById('yohanesResult').innerText = `Peran Asli ${gameState.lastExecutedPlayer.name} adalah: ${gameState.lastExecutedPlayer.role.name} (${gameState.lastExecutedPlayer.role.faction.toUpperCase()})`;
+      }
+    }
+
+    /* PROCESS NIGHT ACTIONS & TRANSITION TO DAY */
+    function processNightPhase() {
+      let killedIds = [];
+      let savedIds = [];
+
+      // Process Cupid Lovers (Night 1)
+      if (gameState.currentPhaseNumber === 1) {
+        const c1 = document.getElementById('cupidTarget1')?.value;
+        const c2 = document.getElementById('cupidTarget2')?.value;
+        if (c1 && c2 && c1 !== c2) {
+          const p1 = gameState.players.find(p => p.id == c1);
+          const p2 = gameState.players.find(p => p.id == c2);
+          p1.loverId = p2.id;
+          p2.loverId = p1.id;
+          logEvent(`Priskila & Akwila menyatukan ${p1.name} dan ${p2.name} sebagai Pasangan Sejiwa.`);
+        }
+      }
+
+      // Target Yudas Kill
+      const y1 = document.getElementById('yudasTarget1')?.value;
+      const isConvert = document.getElementById('yuliusConvertCheck')?.checked;
+
+      if (y1) {
+        if (isConvert) {
+          gameState.usedYuliusConvert = true;
+          const target = gameState.players.find(p => p.id == y1);
+          target.role.faction = 'penyesat';
+          logEvent(`Yulius mengubah ${target.name} menjadi Penyesat baru!`);
+        } else {
+          killedIds.push(parseInt(y1));
+        }
+      }
+
+      if (gameState.barabasRevengeActive) {
+        const y2 = document.getElementById('yudasTarget2')?.value;
+        if (y2) killedIds.push(parseInt(y2));
+        gameState.barabasRevengeActive = false; // Reset revenge
+      }
+
+      // Protections & Heals
+      const protId = document.getElementById('malaikatTarget')?.value;
+      if (protId) {
+        savedIds.push(parseInt(protId));
+        gameState.lastProtectedId = parseInt(protId);
+      }
+
+      const healId = document.getElementById('lukasTarget')?.value;
+      if (healId) {
+        savedIds.push(parseInt(healId));
+      }
+
+      const mariaHeal = document.getElementById('mariaHealCheck')?.checked;
+      if (mariaHeal) {
+        gameState.mariaHealUsed = true;
+        savedIds = savedIds.concat(killedIds); // Saves all targets
+      }
+
+      const mariaPoison = document.getElementById('mariaPoisonTarget')?.value;
+      if (mariaPoison) {
+        gameState.mariaPoisonUsed = true;
+        killedIds.push(parseInt(mariaPoison));
+      }
+
+      // Calculate Final Night Deaths
+      let actualDeaths = killedIds.filter(id => !savedIds.includes(id));
+      actualDeaths = [...new Set(actualDeaths)]; // Remove duplicates
+
+      let deadNames = [];
+      actualDeaths.forEach(id => {
+        const victim = gameState.players.find(p => p.id === id);
+        if (victim && victim.isAlive) {
+          victim.isAlive = false;
+          deadNames.push(victim.name);
+
+          // Check Lover chain death
+          if (victim.loverId) {
+            const lover = gameState.players.find(p => p.id === victim.loverId);
+            if (lover && lover.isAlive) {
+              lover.isAlive = false;
+              deadNames.push(`${lover.name} (Gugur karena Patah Hati)`);
+            }
+          }
+
+          // Check Petrus Hunter Shot
+          if (victim.role.id === 'petrus') {
+            triggerPetrusHunterShot(victim);
+          }
+        }
+      });
+
+      // Show Announcement
+      if (deadNames.length > 0) {
+        showAnnouncement("Kabar Duka Malam Hari", `Pemain yang gugur di malam hari: <br><strong>${deadNames.join(', ')}</strong>`);
+        logEvent(`Malam ${gameState.currentPhaseNumber}: ${deadNames.join(', ')} telah gugur.`);
+      } else {
+        showAnnouncement("Malam yang Tenang", "Puji Tuhan! Tidak ada korban yang gugur pada malam hari ini.");
+        logEvent(`Malam ${gameState.currentPhaseNumber}: Tidak ada korban gugur.`);
+      }
+
+      // Switch to Day Phase
+      gameState.isNight = false;
+      document.getElementById('nightActionsCard').style.display = 'none';
+      document.getElementById('dayActionsCard').style.display = 'block';
+      renderGameplayDashboard();
+    }
+
+    function transitionToNight() {
+      gameState.isNight = true;
+      gameState.currentPhaseNumber++;
+      document.getElementById('nightActionsCard').style.display = 'block';
+      document.getElementById('dayActionsCard').style.display = 'none';
+      logEvent(`Memasuki Fase Malam ${gameState.currentPhaseNumber}.`);
+      renderGameplayDashboard();
+    }
+
+    /* VOTING & DAY EXECUTION MECHANICS */
+    function openVotingModal() {
+      const select = document.getElementById('voteTargetSelect');
+      select.innerHTML = getPlayerOptions();
+      document.getElementById('votingModal').classList.add('active');
+    }
+
+    function closeVotingModal() {
+      document.getElementById('votingModal').classList.remove('active');
+    }
+
+    function executeVotingTarget() {
+      const targetId = document.getElementById('voteTargetSelect').value;
+      if (!targetId) return;
+
+      const victim = gameState.players.find(p => p.id == targetId);
+      victim.isAlive = false;
+      gameState.lastExecutedPlayer = victim;
+
+      closeVotingModal();
+
+      // Check Saulus Fool Win Condition
+      if (victim.role.id === 'saulus') {
+        showAnnouncement("SAULUS MENANG!", `🎉 Saulus (${victim.name}) telah berhasil membuat dirinya sendiri dieksekusi di siang hari! Saulus MENANG SECARA INDEPENDEN!`);
+        logEvent(`Saulus (${victim.name}) dieksekusi dan MENANG!`);
+        renderGameplayDashboard();
+        return;
+      }
+
+      // Check Barabas Double Kill Trigger
+      if (victim.role.id === 'barabas') {
+        gameState.barabasRevengeActive = true;
+        showAnnouncement("Peringatan Barabas!", `⚠️ Barabas (${victim.name}) telah dieksekusi! Hati-hati, faksi Penyesat akan membalas dendam dengan memangsa 2 korban sekaligus di malam berikutnya!`);
+        logEvent(`Barabas dieksekusi. Dendam Barabas aktif untuk malam berikutnya.`);
+      } else {
+        showAnnouncement("Pengadilan Siang Selesai", `${victim.name} telah dieksekusi oleh warga berdasarkan hasil voting.`);
+        logEvent(`${victim.name} dieksekusi pada Siang ${gameState.currentPhaseNumber}.`);
+      }
+
+      // Check Lover Chain Death
+      if (victim.loverId) {
+        const lover = gameState.players.find(p => p.id === victim.loverId);
+        if (lover && lover.isAlive) {
+          lover.isAlive = false;
+          logEvent(`${lover.name} ikut gugur karena patah hati ditinggal ${victim.name}.`);
+        }
+      }
+
+      // Check Petrus Hunter Retaliation
+      if (victim.role.id === 'petrus') {
+        triggerPetrusHunterShot(victim);
+      }
+
+      renderGameplayDashboard();
+    }
+
+    function triggerPetrusHunterShot(petrusPlayer) {
+      setTimeout(() => {
+        const targetName = prompt(`Rasul Petrus (${petrusPlayer.name}) gugur! Masukkan NAMA pemain lain yang ingin ditembak/dibawa gugur bersamanya:`);
+        if (targetName) {
+          const victim = gameState.players.find(p => p.name.toLowerCase().includes(targetName.toLowerCase()) && p.isAlive);
+          if (victim) {
+            victim.isAlive = false;
+            showAnnouncement("Tembakan Rasul Petrus!", `Rasul Petrus membawa ${victim.name} untuk ikut gugur bersamanya!`);
+            logEvent(`Rasul Petrus menembak dan membawa ${victim.name} gugur.`);
+            renderGameplayDashboard();
+          }
+        }
+      }, 500);
+    }
+
+    function manualEliminate(playerId) {
+      const p = gameState.players.find(item => item.id === playerId);
+      if (p && confirm(`Apakah Anda yakin ingin mengeliminasi ${p.name} secara manual?`)) {
+        p.isAlive = false;
+        logEvent(`${p.name} dieliminasi secara manual.`);
+        renderGameplayDashboard();
+      }
+    }
+
+    /* WIN CONDITIONS CHECKER */
+    function checkWinConditions(jemaat, yudas, netral) {
+      if (yudas === 0 && gameState.players.length > 0) {
+        showAnnouncement("FAKSI JEMAAT MENANG! 🏆", "Seluruh pengikut Yudas / Penyesat telah berhasil disingkirkan! Kedamaian dan kebenaran telah ditegakkan.");
+        logEvent("GAME OVER: Faksi Jemaat Menang!");
+      } else if (yudas >= jemaat && yudas > 0) {
+        showAnnouncement("FAKSI PENYESAT MENANG! 🗡️", "Jumlah pengikut Yudas telah sama atau melebihi sisa Jemaat! Faksi Penyesat berhasil menguasai persekutuan.");
+        logEvent("GAME OVER: Faksi Penyesat Menang!");
+      }
+    }
+
+    /* ANNOUNCEMENT MODAL HELPERS */
+    function showAnnouncement(title, bodyHtml) {
+      document.getElementById('announceTitle').innerText = title;
+      document.getElementById('announceBody').innerHTML = bodyHtml;
+      document.getElementById('announcementModal').classList.add('active');
+    }
+
+    function closeAnnouncementModal() {
+      document.getElementById('announcementModal').classList.remove('active');
+    }
+
+    function logEvent(msg) {
+      const logBox = document.getElementById('gameLogBox');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = 'log-item';
+      div.innerHTML = `<span class="log-time">[${time}]</span> ${msg}`;
+      logBox.prepend(div);
+    }
+
+    /* RULES DIRECTORY RENDER */
+    function renderRulesDirectory() {
+      const grid = document.getElementById('rulesRoleGrid');
+      grid.innerHTML = '';
+
+      ROLE_DATABASE.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'role-card';
+        card.innerHTML = `
+          <div class="role-header">
+            <span class="role-name">${r.name}</span>
+            <span class="badge badge-${r.faction}">${r.faction}</span>
+          </div>
+          <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.5rem;">Versi Asli Werewolf: <strong>${r.orig}</strong></p>
+          <p style="font-size:0.85rem; color:var(--text-main);">${r.desc}</p>
+        `;
+        grid.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
